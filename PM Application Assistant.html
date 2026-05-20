@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_4.html -->
+<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_5.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -329,7 +329,18 @@
     <p>Paste a job URL, upload your files, and get outreach materials in one shot.</p>
   </div>
 
-  <div id="api-key" style="display:none;">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</div>
+  <div class="card">
+    <div class="card-label">Anthropic API Key</div>
+    <div class="key-row">
+      <input type="password" id="api-key" placeholder="sk-ant-...">
+      <button class="btn btn-ghost" onclick="toggleKeyVisibility()">Show</button>
+      <button class="btn btn-ghost" onclick="clearKey()">Clear</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-top:0.4rem;">
+      <p class="key-hint" style="margin:0;">Paste once — saved in this browser automatically.</p>
+      <span id="key-status" style="font-size:0.75rem; font-weight:500; white-space:nowrap; color:var(--accent-mid);"></span>
+    </div>
+  </div>
 
   <div id="form-area">
     <div class="card">
@@ -396,8 +407,36 @@ let quickMode = false;
 let jdOpen = false;
 let keyVisible = false;
 
-function toggleKeyVisibility() {}
-function clearKey() {}
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('anthropic_api_key');
+  if (saved) {
+    document.getElementById('api-key').value = saved;
+    document.getElementById('key-status').textContent = 'Key saved';
+  }
+  document.getElementById('api-key').addEventListener('input', function() {
+    const val = this.value.trim();
+    if (val) {
+      localStorage.setItem('anthropic_api_key', val);
+      document.getElementById('key-status').textContent = 'Saved';
+    } else {
+      localStorage.removeItem('anthropic_api_key');
+      document.getElementById('key-status').textContent = '';
+    }
+  });
+});
+
+function toggleKeyVisibility() {
+  keyVisible = !keyVisible;
+  const inp = document.getElementById('api-key');
+  inp.type = keyVisible ? 'text' : 'password';
+  event.target.textContent = keyVisible ? 'Hide' : 'Show';
+}
+
+function clearKey() {
+  localStorage.removeItem('anthropic_api_key');
+  document.getElementById('api-key').value = '';
+  document.getElementById('key-status').textContent = '';
+}
 
 function toggleJD() {
   jdOpen = !jdOpen;
@@ -655,7 +694,8 @@ async function runWorkflow() {
   document.getElementById('error-area').innerHTML = '';
   document.getElementById('results-area').innerHTML = '';
 
-  const apiKey = document.getElementById('api-key').textContent.trim();
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { showError('Please enter your Anthropic API key.'); return; }
 
   const url = document.getElementById('job-url').value.trim();
   const jd = document.getElementById('job-desc').value.trim();
