@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_5.html -->
+<!-- saved from url=(0053)file:///Users/adithichowdhury/Downloads/index_12.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PM Application Assistant</title>
 <link href="./PM Application Assistant_files/css2" rel="stylesheet">
+<script src="./PM Application Assistant_files/jspdf.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -319,6 +320,37 @@
     .uploads-row { grid-template-columns: 1fr; }
     .submit-row { flex-direction: column; align-items: stretch; }
   }
+
+  .resume-btn-wrap {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .btn-resume {
+    background: var(--accent);
+    color: white;
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-resume:hover:not(:disabled) { opacity: 0.88; }
+  .btn-resume:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .resume-note {
+    font-size: 0.78rem;
+    color: var(--text3);
+  }
 </style>
 </head>
 <body>
@@ -329,7 +361,7 @@
     <p>Paste a job URL, upload your files, and get outreach materials in one shot.</p>
   </div>
 
-  <div class="card">
+<div class="card">
     <div class="card-label">Anthropic API Key</div>
     <div class="key-row">
       <input type="password" id="api-key" placeholder="sk-ant-...">
@@ -397,6 +429,7 @@
   <div id="error-area"></div>
   <div id="status-area"></div>
   <div id="results-area"></div>
+<div id="resume-btn-area"></div>
 
 </div>
 
@@ -743,7 +776,7 @@ async function runWorkflow() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 4000,
         system: SYSTEM_PROMPT,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
@@ -761,6 +794,9 @@ async function runWorkflow() {
     const heading = extractHeading(fullText);
     const sections = parseSections(fullText);
     renderResults(heading, sections);
+    lastFullText = fullText;
+    lastHeading = heading || '';
+    showResumeButton();
 
   } catch (err) {
     clearStatus();
@@ -768,6 +804,247 @@ async function runWorkflow() {
   } finally {
     btn.disabled = false;
   }
+}
+
+// ── Resume Generation ──────────────────────────────────────────────
+
+let lastFullText = '';
+let lastHeading = '';
+
+function showResumeButton() {
+  document.getElementById('resume-btn-area').innerHTML = `
+    <div class="resume-btn-wrap">
+      <button class="btn-resume" id="resume-gen-btn" onclick="generateResume()">
+        📄 Create Customized Resume
+      </button>
+      <span class="resume-note">Downloads as PDF to your Downloads folder</span>
+    </div>`;
+}
+
+async function generateResume() {
+  const btn = document.getElementById('resume-gen-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { showError('Please enter your Anthropic API key.'); return; }
+
+  try {
+    // Ask Claude to produce the full customized resume text
+    const prompt = `Based on the resume customization output below, produce the complete full text of the customized resume for Adithi Chowdhury.
+
+Use the EXACT same structure and sections as the original resume:
+1. Header: ADITHI CHOWDHURY | [Role-relevant title], Seattle WA, email, phone, LinkedIn, No Sponsorship Required
+2. Two-line summary (use the revised headliner from the output)
+3. PROFESSIONAL EXPERIENCE (all jobs, with the suggested bullet edits applied — bold the changed bullets by marking them with ** around them)
+4. EDUCATION (unchanged)
+5. CERTIFICATIONS (unchanged)
+6. CORE SKILLS (with the suggested skill tweaks applied)
+
+Original resume content:
+ADITHI CHOWDHURY | Senior Product Manager
+Seattle, WA | adithichowdhury@gmail.com | (574) 299-6353 | LinkedIn | No Sponsorship Required
+10+ years across Product Management, marketplace strategy, and brand leadership at Amazon and Unilever. Defined and scaled the Abusive Brand Building program, reducing missed enforcement by 50% and accelerating detection by 140%. Previously owned a $1.98B P&L across 9 categories, delivering 39.5% above revenue goal.
+
+PROFESSIONAL EXPERIENCE
+Amazon Seattle, WA
+Senior Product Manager, Community Trust Oct 2021 – Present
+• Defined and scaled the Abusive Brand Building (ABB) program in 2025, a network-level graph-based enforcement system, reducing missed enforcement by 50% and accelerating time-to-detect by 140%.
+• Built a scalable ABB detection pipeline combining ML and heuristic signals into a threshold-based risk scoring system, generating a 260K+ prioritized backlog of high-confidence abusive brands through cohort experimentation.
+• Engineered an automation-first enforcement pipeline across brand enforcement, review suppression, and ASIN takedowns, enforcing 5K+ brands, 8K+ sellers, and 0.5M+ ASINs while reducing reliance on manual escalations.
+• Conducted user research with 10 investigators to inform the design of investigator-friendly risk summaries and an interactive LLM assistant, cutting average handling time per case by 80% and avoiding 7 FTEs in incremental Ops capacity.
+• Re-architected identity abuse detection by integrating 200+ risk signals across account, payments, and country-specific dimensions, increasing enforcement by 559% YoY ahead of peak holiday.
+• Negotiated with VP-level stakeholders and the Applied Science lead to secure funding for continuous risk evaluation, validating a 53% enforcement uplift through a POC before unlocking full-scope investment.
+• Architected a three-pillar Vine integrity strategy (prevention, enforcement, discovery), cutting Vine abuse by 25% and enforcing 5M+ reviews through systemic gap closure.
+• Authored a VP-sponsored 3-year product vision and roadmap for the Identity abuse space, contributing to a 20bps reduction in reviews abuse through cross-org ML enhancements.
+• Drove cross-org alignment across Trust, Payments Risk, and Account Integrity teams, operationalizing shared risk signals and enforcement loops to improve enforcement by 10% MoM.
+• Benchmarked abuse detection strategies at financial institutions, identifying 3 gaps in Amazon's approach and incorporating 2 into the 3-year Identity abuse roadmap.
+• Managed a team of 3 program managers through hiring, onboarding, and performance development, promoting 1 high performer to the next level within a year while sustaining multi-year abuse prevention programs.
+
+Senior Product Manager, North America Remote Fulfillment (NARF) Jan 2021 – Sep 2021
+• Executed the 0-to-1 launch of Prepaid Return Labels with a 24-hour refund feature, hitting 92% adoption in month one and generating $2.1M in cost savings while aligning the Canada returns experience with the U.S. standard.
+• Resolved inventory placement gaps by collaborating cross-functionally to separate NARF SKU flows from regular U.S. products, trimming delivery time by 1 day and saving $97M over 3 years.
+• Optimized import fee logic for amazon.ca shipping addresses, removing legal risk and eliminating inconsistent pricing across the shopping funnel.
+
+Senior Category Merchant Manager, Canada Hardlines (Retail Leadership Development) Jul 2019 – Jan 2021
+• Developed a Product Family growth strategy benchmarking Canada Hardlines against U.S. and FRITES, delivering $1.98B in annual GMS (+39.5% vs goal) and $205M in operating profit (+79.6% vs goal) across 9 categories.
+• Partnered with the NARF product team to launch the Canada program, informing selection strategy, opt-in/opt-out design decisions, pricing, and promotion strategy.
+• Led Canada 3P Prime Day and Q4 strategy, surpassing deal goals by 32% ($91M above target) through seller education, 3P Prime Exclusive Discounts ($70.8M sales), and sourced deal execution.
+• Expanded selection by 4.1% via lost vendor recovery, targeted web crawling, and category gap closure in outdoor and ice hockey, adding $12M YoY revenue in Sports.
+
+Unilever Dhaka, Bangladesh
+Hand and Body Brand Manager (Vaseline, Dove, Lux) Jan 2013 – May 2017
+• Owned end-to-end product strategy and P&L for the Hand and Body category, crafting a data-driven category growth strategy that yielded a 15% YoY sales increase driven by a 32% YoY surge in Vaseline sales and a 3.2% market share gain.
+• Created the Vaseline Healing Campaign in partnership with the largest e-commerce site and a top NGO hospital, winning a gold award at the Digital Marketing Summit 2017.
+• Designed and executed the first-ever House of Lux fashion show in Bangladesh, earning $120K in PR and 5M digital impressions.
+Additional Experience: Splunk, Product Marketing MBA Intern (San Francisco, CA) May 2018 – Aug 2018
+
+EDUCATION
+University of Notre Dame, Mendoza College of Business Notre Dame, IN
+Master of Business Administration (MBA), Marketing | Business Analytics | MBA Forte Fellow | Cum Laude
+University of Dhaka, Institute of Business Administration Dhaka, Bangladesh
+Bachelor of Business Administration (BBA), Finance | Marketing | Cum Laude
+
+CERTIFICATIONS: Amazon Day 1 Machine Learning Certification, Amazon | MLU Generative AI Certification, Amazon
+CORE SKILLS: 0-to-1 Product Launches, Product Strategy & Vision, AI/ML Product Development, LLM Integration, Trust & Safety, Risk & Fraud Detection, Cross-Functional Team Leadership, Go-to-Market Strategy, Data Analysis & Experimentation, SQL, Python, Tableau, QuickSight
+
+Customization output from the workflow:
+${lastFullText}
+
+Return ONLY the plain text of the complete resume. No markdown, no commentary, no preamble. Use • for bullets. Mark customized bullets with ** at the start and end of the line so they can be bolded in the PDF.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'API error ' + response.status);
+    const resumeText = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+
+    buildPDF(resumeText);
+
+  } catch (err) {
+    alert('Error generating resume: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📄 Create Customized Resume';
+  }
+}
+
+function buildPDF(resumeText) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+
+  const marginL = 45;
+  const marginR = 45;
+  const pageW = 612;
+  const contentW = pageW - marginL - marginR;
+  const marginT = 45;
+  const marginB = 45;
+  const pageH = 792;
+
+  let y = marginT;
+
+  function checkPage(needed) {
+    if (y + needed > pageH - marginB) {
+      doc.addPage();
+      y = marginT;
+    }
+  }
+
+  const lines = resumeText.split('
+');
+
+  let inExperience = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trim();
+    if (!line) { y += 4; continue; }
+
+    const isBold = line.startsWith('**') && line.endsWith('**');
+    const cleanLine = isBold ? line.slice(2, -2).trim() : line;
+
+    // NAME line (all caps, first line)
+    if (i === 0 || (cleanLine === cleanLine.toUpperCase() && cleanLine.length > 10 && cleanLine.includes('|') && i < 3)) {
+      const parts = cleanLine.split('|');
+      checkPage(22);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(parts[0].trim(), marginL, y);
+      if (parts[1]) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(' | ' + parts.slice(1).join(' | ').trim(), marginL + doc.getTextWidth(parts[0].trim()), y);
+      }
+      y += 14;
+      continue;
+    }
+
+    // Contact line (has email/phone)
+    if (cleanLine.includes('@') || cleanLine.includes('Sponsorship')) {
+      checkPage(14);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.text(cleanLine, marginL, y);
+      y += 12;
+      continue;
+    }
+
+    // Section headers (all caps, no bullet)
+    if (cleanLine === cleanLine.toUpperCase() && !cleanLine.startsWith('•') && cleanLine.length > 3 && !cleanLine.match(/^\d/) && cleanLine.replace(/[^A-Z]/g,'').length > 4) {
+      checkPage(20);
+      if (y > marginT + 30) y += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text(cleanLine, marginL, y);
+      y += 2;
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.75);
+      doc.line(marginL, y + 1, marginL + contentW, y + 1);
+      y += 9;
+      inExperience = cleanLine.includes('EXPERIENCE');
+      continue;
+    }
+
+    // Company / Role lines (bold, no bullet) — date at right
+    if (!cleanLine.startsWith('•') && !cleanLine.startsWith('Additional') && inExperience && (cleanLine.match(/\d{4}/) || cleanLine.match(/Amazon|Unilever|Splunk/))) {
+      const dateMatch = cleanLine.match(/((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}.*$)/);
+      const dateStr = dateMatch ? dateMatch[1] : '';
+      const mainStr = dateStr ? cleanLine.replace(dateStr, '').trim() : cleanLine;
+      checkPage(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text(mainStr, marginL, y);
+      if (dateStr) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        const dateW = doc.getTextWidth(dateStr);
+        doc.text(dateStr, marginL + contentW - dateW, y);
+      }
+      y += 12;
+      continue;
+    }
+
+    // Bullet points
+    if (cleanLine.startsWith('•')) {
+      const bulletText = cleanLine.slice(1).trim();
+      const font = isBold ? 'bold' : 'normal';
+      doc.setFont('helvetica', font);
+      doc.setFontSize(8.5);
+      const wrapped = doc.splitTextToSize(bulletText, contentW - 12);
+      checkPage(wrapped.length * 11 + 2);
+      doc.text('•', marginL, y);
+      doc.text(wrapped, marginL + 10, y);
+      y += wrapped.length * 10.5 + 1.5;
+      continue;
+    }
+
+    // CERTIFICATIONS / CORE SKILLS / Additional Experience lines
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    const wrapped = doc.splitTextToSize(cleanLine, contentW);
+    checkPage(wrapped.length * 11);
+    doc.text(wrapped, marginL, y);
+    y += wrapped.length * 11;
+  }
+
+  // Derive filename from heading
+  const company = lastHeading ? lastHeading.split('--')[0].trim().replace(/\s+/g, '_') : 'Company';
+  const role = lastHeading ? (lastHeading.split('--')[1] || '').trim().replace(/\s+/g, '_') : 'Role';
+  const filename = 'Adithi_Chowdhury_Resume_' + company + '_' + role + '.pdf';
+  doc.save(filename);
 }
 </script>
 
