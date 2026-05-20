@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_4.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Application Assistant</title>
+<link href="./PM Application Assistant_files/css2" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: #ddd9d0;
+    --border2: #c9c4b8;
+    --text: #1a1916;
+    --text2: #5a574f;
+    --text3: #8a8780;
+    --accent: #2d4a3e;
+    --accent-light: #e8f0ec;
+    --accent-mid: #4a7c66;
+    --warn: #7a4a1e;
+    --warn-bg: #fdf3e8;
+    --danger: #7a1e1e;
+    --danger-bg: #fdf0f0;
+    --tag-bg: #e2ede7;
+    --tag-text: #1e4a35;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .header { margin-bottom: 2.5rem; }
+
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .header h1 em { color: var(--accent-mid); font-style: italic; }
+  .header p { margin-top: 0.5rem; font-size: 0.875rem; color: var(--text2); }
+
+  .api-notice {
+    background: var(--warn-bg);
+    border: 1px solid #e8c89a;
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+    font-size: 0.82rem;
+    color: var(--warn);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+
+  input[type="url"], input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.875rem;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+  }
+
+  input[type="url"]:focus, input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+    border-color: var(--accent-mid);
+  }
+
+  textarea { min-height: 120px; font-size: 0.85rem; line-height: 1.6; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--border2);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after { transform: translateX(16px); }
+  .toggle-label { font-size: 0.875rem; color: var(--text2); }
+
+  .quick-tag {
+    font-size: 0.75rem;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent-mid); background: var(--accent-light); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 1.4rem; margin-bottom: 0.35rem; color: var(--text3); }
+  .upload-zone p { font-size: 0.82rem; color: var(--text2); }
+  .upload-zone .file-name { font-size: 0.82rem; color: var(--accent); font-weight: 500; margin-top: 0.25rem; }
+
+  .uploads-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+
+  .submit-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.25rem; }
+
+  .btn {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); padding: 0.65rem 1rem; }
+  .btn-ghost:hover:not(:disabled) { background: var(--surface2); }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text2);
+    padding: 0.75rem 1rem;
+    background: var(--accent-light);
+    border: 1px solid #b8d4c4;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent-mid);
+    animation: pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .results { margin-top: 1.5rem; }
+
+  .result-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s;
+  }
+
+  .result-header:hover { background: var(--surface2); }
+
+  .result-header-left { display: flex; align-items: center; gap: 0.6rem; }
+
+  .section-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+  .chevron { font-size: 0.75rem; color: var(--text3); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .result-body {
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-family: 'Figtree', sans-serif;
+  }
+
+  .result-body.mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    background: var(--surface2);
+    padding: 1rem 1.25rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  .copy-btn {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text3);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent-mid); }
+  .copy-btn.copied { color: var(--accent); border-color: var(--accent-mid); }
+
+  .error-box {
+    background: var(--danger-bg);
+    border: 1px solid #f0baba;
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+    font-size: 0.85rem;
+    color: var(--danger);
+    margin-bottom: 1rem;
+  }
+
+  .company-banner {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    padding: 1.25rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+  }
+
+  .company-banner span { color: var(--accent-mid); font-style: italic; }
+
+  .key-row { display: flex; align-items: center; gap: 0.5rem; }
+  .key-row input { flex: 1; font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+  .key-hint { font-size: 0.75rem; color: var(--text3); margin-top: 0.4rem; }
+
+  @media (max-width: 600px) {
+    .uploads-row { grid-template-columns: 1fr; }
+    .submit-row { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="header">
+    <h1>PM Application <em>Assistant</em></h1>
+    <p>Paste a job URL, upload your files, and get outreach materials in one shot.</p>
+  </div>
+
+  <div id="api-key" style="display:none;">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</div>
+
+  <div id="form-area">
+    <div class="card">
+      <div class="card-label">Job posting URL</div>
+      <input type="url" id="job-url" placeholder="https://company.com/jobs/...">
+
+      <div id="jd-toggle-row" class="toggle-row" onclick="toggleJD()">
+        <div class="toggle" id="jd-toggle"></div>
+        <span class="toggle-label">Paste job description manually (for Workday / iCIMS / JS-heavy pages)</span>
+      </div>
+
+      <div id="jd-area" style="display:none; margin-top:0.875rem;">
+        <textarea id="job-desc" placeholder="Paste the full job description here..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Upload files</div>
+      <div class="uploads-row">
+        <div>
+          <p style="font-size:0.78rem; color:var(--text3); margin-bottom:0.4rem;">Resume(s)</p>
+          <div class="upload-zone" id="resume-zone" ondragover="drag(event,&#39;resume-zone&#39;)" ondragleave="undrag(&#39;resume-zone&#39;)" ondrop="drop(event,&#39;resume&#39;)">
+            <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleFile(event,&#39;resume&#39;)">
+            <div class="upload-icon">📄</div>
+            <p>Click or drop PDF / TXT</p>
+            <div class="file-name" id="resume-name"></div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:0.78rem; color:var(--text3); margin-bottom:0.4rem;">Outreach templates PDF</p>
+          <div class="upload-zone" id="template-zone" ondragover="drag(event,&#39;template-zone&#39;)" ondragleave="undrag(&#39;template-zone&#39;)" ondrop="drop(event,&#39;template&#39;)">
+            <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleFile(event,&#39;template&#39;)">
+            <div class="upload-icon">📋</div>
+            <p>LinkedIn Email Outreach Templates</p>
+            <div class="file-name" id="template-name"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:1.25rem 1.5rem;">
+      <div class="toggle-row" style="margin:0;" onclick="toggleQuick()">
+        <div class="toggle" id="quick-toggle"></div>
+        <span class="toggle-label">Quick mode <span class="quick-tag">Skips research + InMail</span></span>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn btn-primary" id="run-btn" onclick="runWorkflow()">Run full workflow ↗</button>
+      <button class="btn btn-ghost" onclick="resetAll()">Clear</button>
+    </div>
+  </div>
+
+  <div id="error-area"></div>
+  <div id="status-area"></div>
+  <div id="results-area"></div>
+
+</div>
+
+<script>
+let resumeFiles = [];
+let templateFile = null;
+let quickMode = false;
+let jdOpen = false;
+let keyVisible = false;
+
+function toggleKeyVisibility() {}
+function clearKey() {}
+
+function toggleJD() {
+  jdOpen = !jdOpen;
+  document.getElementById('jd-toggle').className = 'toggle' + (jdOpen ? ' on' : '');
+  document.getElementById('jd-area').style.display = jdOpen ? 'block' : 'none';
+}
+
+function toggleQuick() {
+  quickMode = !quickMode;
+  document.getElementById('quick-toggle').className = 'toggle' + (quickMode ? ' on' : '');
+  document.getElementById('run-btn').textContent = quickMode ? 'Run quick mode ↗' : 'Run full workflow ↗';
+}
+
+function drag(e, zoneId) { e.preventDefault(); document.getElementById(zoneId).classList.add('drag'); }
+function undrag(zoneId) { document.getElementById(zoneId).classList.remove('drag'); }
+function drop(e, type) {
+  e.preventDefault();
+  undrag(type === 'resume' ? 'resume-zone' : 'template-zone');
+  handleFiles(e.dataTransfer.files, type);
+}
+
+function handleFile(e, type) { handleFiles(e.target.files, type); }
+
+function handleFiles(files, type) {
+  if (type === 'resume') {
+    resumeFiles = Array.from(files);
+    document.getElementById('resume-name').textContent = resumeFiles.map(f => f.name).join(', ');
+  } else {
+    templateFile = files[0];
+    document.getElementById('template-name').textContent = templateFile ? templateFile.name : '';
+  }
+}
+
+function resetAll() {
+  document.getElementById('job-url').value = '';
+  document.getElementById('job-desc').value = '';
+  resumeFiles = [];
+  templateFile = null;
+  document.getElementById('resume-name').textContent = '';
+  document.getElementById('template-name').textContent = '';
+  document.getElementById('resume-input').value = '';
+  document.getElementById('template-input').value = '';
+  document.getElementById('error-area').innerHTML = '';
+  document.getElementById('status-area').innerHTML = '';
+  document.getElementById('results-area').innerHTML = '';
+}
+
+function showError(msg) {
+  document.getElementById('error-area').innerHTML = '<div class="error-box">' + msg + '</div>';
+}
+
+function showStatus(msg) {
+  document.getElementById('status-area').innerHTML = '<div class="status-bar"><div class="dot"></div>' + msg + '</div>';
+}
+
+function clearStatus() { document.getElementById('status-area').innerHTML = ''; }
+
+async function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Read failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+async function fileToText(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(new Error('Read failed'));
+    r.readAsText(file);
+  });
+}
+
+function getMimeType(file) {
+  if (file.name.endsWith('.pdf')) return 'application/pdf';
+  return 'text/plain';
+}
+
+function sectionLabel(idx) {
+  const labels = ['Role Analysis', 'Company & Role Research', 'Resume Base Pick', 'Resume Bullet Edits', 'Cold InMail', 'LinkedIn Connection Request', 'Warnings & Blanks'];
+  return labels[idx] || ('Section ' + (idx + 1));
+}
+
+function isMono(label) {
+  return label.includes('InMail') || label.includes('LinkedIn') || label.includes('Resume Bullet');
+}
+
+function parseSections(text) {
+  const patterns = [
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Role Analysis|Step 1)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Company|Role Research|Step 2)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Resume Base|Resume Variant|Step 3[^B])/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Resume Bullet|Bullet Edits?)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Cold InMail|InMail|Step 4)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:LinkedIn Connection|Connection Request|Step 5)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s+)?(?:Warnings?|Blanks?|Step 6)/i,
+  ];
+
+  const allMatches = [];
+  for (let i = 0; i < patterns.length; i++) {
+    const m = text.match(patterns[i]);
+    if (m) allMatches.push({ idx: i, pos: m.index });
+  }
+  allMatches.sort((a, b) => a.pos - b.pos);
+
+  if (allMatches.length === 0) return [{ label: 'Results', content: text }];
+
+  const sections = [];
+  for (let i = 0; i < allMatches.length; i++) {
+    const start = allMatches[i].pos;
+    const end = i + 1 < allMatches.length ? allMatches[i + 1].pos : text.length;
+    sections.push({
+      label: sectionLabel(allMatches[i].idx),
+      content: text.slice(start, end).replace(/^#{1,3}\s*\*?\*?[^\n]*\n?/, '').trim()
+    });
+  }
+
+  if (allMatches[0].pos > 50) {
+    sections.unshift({ label: 'Summary', content: text.slice(0, allMatches[0].pos).trim() });
+  }
+
+  return sections;
+}
+
+let openSections = {};
+
+function toggleSection(id) {
+  openSections[id] = !openSections[id];
+  document.getElementById('body-' + id).style.display = openSections[id] ? 'block' : 'none';
+  document.getElementById('chev-' + id).className = 'chevron' + (openSections[id] ? ' open' : '');
+}
+
+function copySection(id, btn) {
+  const text = document.getElementById('body-' + id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.className = 'copy-btn copied';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.className = 'copy-btn'; }, 1800);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function extractHeading(text) {
+  const m = text.match(/^\*?\*?([A-Z][^\n]+--[^\n]+)\*?\*?/);
+  return m ? m[1].replace(/\*\*/g, '') : null;
+}
+
+function renderResults(heading, sections) {
+  const area = document.getElementById('results-area');
+  let html = '';
+
+  if (heading) {
+    const parts = heading.split('--').map(s => s.trim());
+    html += '<div class="company-banner">' + escHtml(parts[0]) + ' <span>' + (parts[1] ? '&mdash; ' + escHtml(parts[1]) : '') + '</span></div>';
+  }
+
+  html += '<div class="results">';
+  sections.forEach((s, i) => {
+    openSections[i] = true;
+    const mono = isMono(s.label);
+    html += '<div class="result-section">' +
+      '<div class="result-header" onclick="toggleSection(' + i + ')">' +
+        '<div class="result-header-left">' +
+          '<div class="section-num">' + (i + 1) + '</div>' +
+          '<div class="section-title">' + escHtml(s.label) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:0.5rem;">' +
+          '<button class="copy-btn" onclick="event.stopPropagation();copySection(' + i + ',this)">Copy</button>' +
+          '<div class="chevron open" id="chev-' + i + '">&#9660;</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="result-body' + (mono ? ' mono' : '') + '" id="body-' + i + '" style="display:block;">' + escHtml(s.content) + '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+const SYSTEM_PROMPT = `# PM Job Application Assistant
+
+## Overview
+The user is a job-seeking product management professional. Generate text artifacts to streamline networking and outreach for every job application.
+
+When the user pastes a job posting URL, execute the full workflow below.
+
+## Quick Mode
+If the user writes "quick" alongside the URL, skip Steps 2 (Company Research) and 4 (InMail), and produce only:
+- Role Analysis (Step 1)
+- Resume Base Pick + Bullet Edits (Step 3)
+- LinkedIn Connection Request (Step 5)
+- Warnings & Blanks if applicable (Step 6)
+
+## Workflow
+
+### Step 1: Fetch & Analyze the Job Posting
+- Fetch the job posting URL and extract the full role description, requirements, and qualifications.
+- Identify the top 3-5 nontrivial requirements that overlap meaningfully with the user's profile. Skip generic filler like "strong communicator" or "team player." Focus on specific technical skills, domain expertise, product types, or experience patterns.
+- For each requirement, briefly note why it maps to the user's experience (1 sentence max).
+- If the job posting cannot be fully extracted from the URL (common with Workday, iCIMS, Taleo, or JS-heavy pages), stop and ask the user to paste the posting text directly.
+
+### Step 2: Company & Role Research
+- Search for recent news, product launches, feature announcements, funding rounds, partnerships, leadership changes, or relevant industry trends related to the company.
+- Summarize 3-5 findings that the user could reference in outreach to demonstrate domain awareness.
+- Highlight any connections between a finding and something the user has directly worked on.
+- Do NOT weave these findings into the outreach templates.
+
+### Step 3: Resume Customization
+- Pick the best base resume from the uploaded variants. Explain why.
+- Headliner edit: Revise the summary at the top of the resume to reflect the specific role. Keep it to two lines.
+- Skills tweaks: Suggest 2-5 skills to add or swap in the Skills section, targeting keywords from the job posting.
+- Suggest specific bullet-level edits targeting the top 3-5 requirements. Quote the original bullet, provide the revised bullet. Keep edits surgical.
+
+### Step 4: Cold InMail Draft
+- Write a cold InMail/email for reaching out to hiring managers, team leads, or senior PMs.
+- Aim for 100-150 words. Direct, confident, not sycophantic.
+- Include a subject line. Make it specific and eye-catching, not generic.
+
+### Step 5: LinkedIn Connection Request
+- Write a short LinkedIn connection request message, under 300 characters.
+- Purpose: asking the person to connect the user with their recruiter or relevant hiring contact.
+- Keep it casual and human.
+
+### Step 6: Warnings & Blanks (only if needed)
+- If any output contains a blank (marked as [___]), explain what information is missing.
+- Add a brief warning for anything risky to send without review.
+- Skip this section entirely if everything looks clean.
+
+## Output Format
+Start every response with a heading: [Company Name] -- [Role Title]
+
+Present outputs in this order:
+### 1. Role Analysis
+### 2. Company/Role Research
+### 3. Resume Base Pick
+### 4. Resume Bullet Edits
+### 5. Cold InMail
+### 6. LinkedIn Connection Request
+### 7. Warnings & Blanks (if applicable)
+
+## Format & Tone Rules
+- No em dashes. Use commas, semicolons, periods, or parentheses instead.
+- Write in the user's voice: direct, concise, confident.
+- Don't open messages with "I was excited to see..." or similar cliche openers.
+- Don't use "I'd love to" more than once across all outputs.
+- Keep bullets punchy.
+- Use clean, smooth language. Avoid corporate jargon.
+- Use blanks [___] sparingly.`;
+
+async function runWorkflow() {
+  document.getElementById('error-area').innerHTML = '';
+  document.getElementById('results-area').innerHTML = '';
+
+  const apiKey = document.getElementById('api-key').textContent.trim();
+
+  const url = document.getElementById('job-url').value.trim();
+  const jd = document.getElementById('job-desc').value.trim();
+  if (!url && !jd) { showError('Please enter a job posting URL or paste the job description.'); return; }
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+
+  showStatus('Reading files...');
+
+  try {
+    const userContentParts = [];
+
+    for (const file of resumeFiles) {
+      if (file.name.endsWith('.txt')) {
+        const text = await fileToText(file);
+        userContentParts.push({ type: 'text', text: 'Resume file "' + file.name + '":\n' + text });
+      } else {
+        const b64 = await fileToBase64(file);
+        userContentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 }, title: file.name });
+      }
+    }
+
+    if (templateFile) {
+      if (templateFile.name.endsWith('.txt')) {
+        const text = await fileToText(templateFile);
+        userContentParts.push({ type: 'text', text: 'Outreach templates:\n' + text });
+      } else {
+        const b64 = await fileToBase64(templateFile);
+        userContentParts.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 }, title: templateFile.name });
+      }
+    }
+
+    const userMsg = (quickMode ? 'quick ' : '') + (url || '') + (jd ? '\nJob description:\n' + jd : '');
+    userContentParts.push({ type: 'text', text: userMsg.trim() });
+
+    showStatus('Calling Claude API, this may take a minute...');
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: SYSTEM_PROMPT,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: userContentParts }]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'API error ' + response.status);
+
+    const fullText = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+    if (!fullText.trim()) throw new Error('No text content returned from Claude.');
+
+    clearStatus();
+    const heading = extractHeading(fullText);
+    const sections = parseSections(fullText);
+    renderResults(heading, sections);
+
+  } catch (err) {
+    clearStatus();
+    showError('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+
+
+</body></html>
