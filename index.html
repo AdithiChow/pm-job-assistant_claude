@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///Users/adithichowdhury/Downloads/index_12.html -->
+<!-- saved from url=(0053)file:///Users/adithichowdhury/Downloads/index_14.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PM Application Assistant</title>
-<link href="./PM Application Assistant_files/css2" rel="stylesheet">
-<script src="./PM Application Assistant_files/jspdf.umd.min.js"></script>
+<link href="./index_files/css2" rel="stylesheet">
+<script src="./index_files/jspdf.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -156,17 +156,28 @@
     border-radius: var(--radius-sm);
     padding: 1.25rem;
     text-align: center;
-    cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
     background: var(--surface2);
-    position: relative;
   }
 
   .upload-zone:hover, .upload-zone.drag { border-color: var(--accent-mid); background: var(--accent-light); }
-  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-zone input[type="file"] { display: none; }
   .upload-icon { font-size: 1.4rem; margin-bottom: 0.35rem; color: var(--text3); }
-  .upload-zone p { font-size: 0.82rem; color: var(--text2); }
-  .upload-zone .file-name { font-size: 0.82rem; color: var(--accent); font-weight: 500; margin-top: 0.25rem; }
+  .upload-zone p { font-size: 0.82rem; color: var(--text2); margin-bottom: 0.5rem; }
+  .upload-zone .file-name { font-size: 0.82rem; color: var(--accent); font-weight: 500; margin-top: 0.5rem; }
+  .upload-btn {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-top: 0.25rem;
+  }
+  .upload-btn:hover { opacity: 0.85; }
 
   .uploads-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
 
@@ -397,7 +408,8 @@
           <div class="upload-zone" id="resume-zone" ondragover="drag(event,&#39;resume-zone&#39;)" ondragleave="undrag(&#39;resume-zone&#39;)" ondrop="drop(event,&#39;resume&#39;)">
             <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleFile(event,&#39;resume&#39;)">
             <div class="upload-icon">📄</div>
-            <p>Click or drop PDF / TXT</p>
+            <p>PDF or TXT resume(s)</p>
+            <button class="upload-btn" onclick="document.getElementById(&#39;resume-input&#39;).click()">Choose File</button>
             <div class="file-name" id="resume-name"></div>
           </div>
         </div>
@@ -406,7 +418,8 @@
           <div class="upload-zone" id="template-zone" ondragover="drag(event,&#39;template-zone&#39;)" ondragleave="undrag(&#39;template-zone&#39;)" ondrop="drop(event,&#39;template&#39;)">
             <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleFile(event,&#39;template&#39;)">
             <div class="upload-icon">📋</div>
-            <p>LinkedIn Email Outreach Templates</p>
+            <p>Outreach Templates PDF</p>
+            <button class="upload-btn" onclick="document.getElementById(&#39;template-input&#39;).click()">Choose File</button>
             <div class="file-name" id="template-name"></div>
           </div>
         </div>
