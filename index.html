@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_1.html -->
+<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_3.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PM Application Assistant</title>
-<script src="./index_files/jspdf.umd.min.js"></script>
-<script src="./index_files/jspdf.umd(1).min.js" onerror="console.log(&#39;jspdf fallback failed&#39;)"></script>
 <link href="./index_files/css2" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -432,7 +430,7 @@ async function runWorkflow() {
     document.getElementById('resume-bar-area').innerHTML =
       '<div class="resume-bar">' +
         '<button class="btn-resume" id="res-btn" onclick="generateResume()">📄 Create Customized Resume</button>' +
-        '<span class="resume-note">Downloads as PDF to your Downloads folder</span>' +
+        '<span class="resume-note">Downloads as HTML — open and Print → Save as PDF</span>' +
       '</div>';
 
   } catch(e) {
@@ -499,22 +497,27 @@ async function generateResume() {
   const apiKey = document.getElementById('api-key').value.trim();
 
   try {
-    const prompt = `You are producing a customized resume for Adithi Chowdhury based on job application workflow output.
+    // Extract only the relevant sections to reduce token usage
+    const sections = parseSections(lastFullText);
+    const headlinerSection = sections.find(s => s.label === 'Resume Base Pick') || {};
+    const bulletSection = sections.find(s => s.label === 'Resume Bullet Edits') || {};
+    const skillsHint = lastFullText.match(/skill[^\n]*:\s*([^\n]+)/i)?.[1] || '';
 
-ORIGINAL RESUME:
+    const prompt = `Produce a customized resume for Adithi Chowdhury. Apply these edits to the original resume and return the full resume as plain text only. No markdown, no commentary.
+
+EDITS TO APPLY:
+HEADLINER: ${headlinerSection.content ? headlinerSection.content.slice(0, 400) : 'Keep original'}
+BULLET EDITS: ${bulletSection.content ? bulletSection.content.slice(0, 800) : 'Keep original'}
+SKILLS TWEAK: ${skillsHint.slice(0, 200) || 'Keep original'}
+
+ORIGINAL RESUME (apply edits to this):
 ${ORIGINAL_RESUME}
 
-WORKFLOW OUTPUT (contains headliner edit, bullet edits, skill tweaks to apply):
-${lastFullText}
-
-INSTRUCTIONS:
-- Output the complete resume with all suggested edits applied.
-- Keep exact same structure and sections.
-- Apply the revised headliner (2 lines, same format).
-- Apply all suggested bullet edits. Mark each changed bullet by starting the line with [BOLD] so it can be highlighted.
-- Apply skill tweaks to the CORE SKILLS line.
-- Do not add commentary, preamble, or markdown. Plain text only.
-- Use • for bullets.`;
+Rules:
+- Use • for bullets
+- Mark changed bullets with [BOLD] at line start
+- Keep all sections, structure, and formatting identical
+- Plain text only, no markdown`;
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
