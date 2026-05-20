@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_3.html -->
+<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_4.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -489,168 +489,89 @@ Bachelor of Business Administration (BBA), Finance | Marketing | Cum Laude
 CERTIFICATIONS: Amazon Day 1 Machine Learning Certification | MLU Generative AI Certification, Amazon
 CORE SKILLS: 0-to-1 Product Launches, Product Strategy & Vision, AI/ML Product Development, LLM Integration, Trust & Safety, Risk & Fraud Detection, Cross-Functional Team Leadership, Go-to-Market Strategy, Data Analysis & Experimentation, SQL, Python, Tableau, QuickSight`;
 
-async function generateResume() {
-  const btn = document.getElementById('res-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
+function generateResume() {
+  // Parse the workflow output to extract edits
+  const sections = parseSections(lastFullText);
+  const headlinerSection = (sections.find(s => s.label === 'Resume Base Pick') || {}).content || '';
+  const bulletSection = (sections.find(s => s.label === 'Resume Bullet Edits') || {}).content || '';
 
-  const apiKey = document.getElementById('api-key').value.trim();
+  // Extract revised headliner (look for quoted or labelled summary text)
+  let newHeadliner = '';
+  const hlMatch = headlinerSection.match(/(?:revised?|new|updated|headliner)[^:]*:\s*[""]?([^
+"]+(?:
+[^
+"]+)?)/i);
+  if (hlMatch) newHeadliner = hlMatch[1].trim();
 
-  try {
-    // Extract only the relevant sections to reduce token usage
-    const sections = parseSections(lastFullText);
-    const headlinerSection = sections.find(s => s.label === 'Resume Base Pick') || {};
-    const bulletSection = sections.find(s => s.label === 'Resume Bullet Edits') || {};
-    const skillsHint = lastFullText.match(/skill[^\n]*:\s*([^\n]+)/i)?.[1] || '';
+  // Extract bullet replacements: look for "Revised:" or "->" patterns
+  const bulletEdits = [];
+  const bulletMatches = bulletSection.matchAll(/(?:revised?|new)[^:]*:\s*[•\-]?\s*(.+?)(?=
+(?:original|revised?|•|\-|$)|
 
-    const prompt = `Produce a customized resume for Adithi Chowdhury. Apply these edits to the original resume and return the full resume as plain text only. No markdown, no commentary.
-
-EDITS TO APPLY:
-HEADLINER: ${headlinerSection.content ? headlinerSection.content.slice(0, 400) : 'Keep original'}
-BULLET EDITS: ${bulletSection.content ? bulletSection.content.slice(0, 800) : 'Keep original'}
-SKILLS TWEAK: ${skillsHint.slice(0, 200) || 'Keep original'}
-
-ORIGINAL RESUME (apply edits to this):
-${ORIGINAL_RESUME}
-
-Rules:
-- Use • for bullets
-- Mark changed bullets with [BOLD] at line start
-- Keep all sections, structure, and formatting identical
-- Plain text only, no markdown`;
-
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 3000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'API error ' + res.status);
-    const resumeText = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
-
-    buildPDF(resumeText);
-  } catch(e) {
-    alert('Resume generation error: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '📄 Create Customized Resume';
+)/gis);
+  for (const m of bulletMatches) {
+    bulletEdits.push(m[1].trim());
   }
+
+  // Build resume text from original, applying edits
+  let resumeLines = ORIGINAL_RESUME.split('
+');
+
+  // Apply headliner if found
+  if (newHeadliner) {
+    for (let i = 0; i < resumeLines.length; i++) {
+      if (i > 0 && resumeLines[i].includes('years') && resumeLines[i].includes('Amazon')) {
+        resumeLines[i] = '**' + newHeadliner + '**';
+        if (resumeLines[i+1] && !resumeLines[i+1].startsWith('PROFESSIONAL')) {
+          resumeLines.splice(i+1, 1);
+        }
+        break;
+      }
+    }
+  }
+
+  // Apply bullet edits - match original bullets and replace
+  if (bulletEdits.length > 0) {
+    let editIdx = 0;
+    // Look for "Original:" blocks to find which bullets to replace
+    const origMatches = [...bulletSection.matchAll(/original[^:]*:\s*[•\-]?\s*(.{20,100})/gi)];
+    origMatches.forEach((om, idx) => {
+      if (!bulletEdits[idx]) return;
+      const origSnippet = om[1].trim().slice(0, 50).toLowerCase();
+      for (let i = 0; i < resumeLines.length; i++) {
+        if (resumeLines[i].toLowerCase().includes(origSnippet.slice(0, 30))) {
+          resumeLines[i] = '• **' + bulletEdits[idx].replace(/^[•\-]\s*/, '') + '**';
+          break;
+        }
+      }
+    });
+  }
+
+  openResumeWindow(resumeLines.join('
+'));
 }
 
-function buildPDF(text) {
-  const jsPDFLib = window.jspdf || window.jsPDF;
-  if (!jsPDFLib) { alert('PDF library failed to load. Please refresh the page and try again.'); return; }
-  const { jsPDF } = jsPDFLib;
-  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-  const ML = 45, MR = 45, MT = 45, MB = 45;
-  const PW = 612, PH = 792;
-  const CW = PW - ML - MR;
-  let y = MT;
-
-  function newPageIfNeeded(h) {
-    if (y + h > PH - MB) { doc.addPage(); y = MT; }
-  }
-
+function openResumeWindow(text) {
   const lines = text.split('\n');
-  let firstLine = true;
-
+  let body = '';
+  let isFirst = true;
   for (let i = 0; i < lines.length; i++) {
-    const raw = lines[i];
-    const trimmed = raw.trim();
-    if (!trimmed) { y += 4; continue; }
-
-    const isBoldBullet = trimmed.startsWith('[BOLD]');
-    const clean = isBoldBullet ? trimmed.slice(6).trim() : trimmed;
-
-    // Name line (first non-empty line)
-    if (firstLine) {
-      firstLine = false;
-      const parts = clean.split('|');
-      newPageIfNeeded(18);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11.5);
-      doc.text(parts[0].trim(), ML, y);
-      if (parts[1]) {
-        const w = doc.getTextWidth(parts[0].trim());
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9.5);
-        doc.text(' | ' + parts.slice(1).join(' | ').trim(), ML + w, y);
-      }
-      y += 14; continue;
-    }
-
-    // Contact / location line
-    if (clean.includes('@') || clean.includes('Sponsorship') || (clean.includes('Seattle') && clean.includes('|'))) {
-      newPageIfNeeded(13);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.text(clean, ML, y);
-      y += 12; continue;
-    }
-
-    // Section headers (ALL CAPS, no bullet)
-    if (clean === clean.toUpperCase() && !clean.startsWith('•') && clean.length > 4 && /[A-Z]{3}/.test(clean)) {
-      y += 5;
-      newPageIfNeeded(18);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.text(clean, ML, y);
-      y += 2;
-      doc.setDrawColor(0); doc.setLineWidth(0.6);
-      doc.line(ML, y + 1, ML + CW, y + 1);
-      y += 9; continue;
-    }
-
-    // Bullet points
-    if (clean.startsWith('•')) {
-      const btext = clean.slice(1).trim();
-      doc.setFont('helvetica', isBoldBullet ? 'bold' : 'normal');
-      doc.setFontSize(8.5);
-      const wrapped = doc.splitTextToSize(btext, CW - 12);
-      newPageIfNeeded(wrapped.length * 11 + 2);
-      doc.text('•', ML, y);
-      doc.text(wrapped, ML + 10, y);
-      y += wrapped.length * 10.5 + 1.5; continue;
-    }
-
-    // Job title / company lines with dates
-    const dateMatch = clean.match(/((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}(?:\s*[–-]\s*(?:Present|\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}))?)/);
-    if (dateMatch && !clean.startsWith('•') && !clean.startsWith('Additional')) {
-      const dateStr = dateMatch[0];
-      const mainStr = clean.replace(dateStr, '').replace(/\|\s*$/, '').trim();
-      newPageIfNeeded(13);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text(mainStr, ML, y);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      const dw = doc.getTextWidth(dateStr);
-      doc.text(dateStr, ML + CW - dw, y);
-      y += 12; continue;
-    }
-
-    // Everything else (education lines, additional exp, certs, skills)
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    const wrapped = doc.splitTextToSize(clean, CW);
-    newPageIfNeeded(wrapped.length * 11);
-    doc.text(wrapped, ML, y);
-    y += wrapped.length * 11;
+    const t = lines[i].trim();
+    if (!t) { body += '<div style="height:3px"></div>'; continue; }
+    const isBold = t.startsWith('**') && t.endsWith('**');
+    const clean = isBold ? t.slice(2,-2).trim() : t;
+    if (isFirst) { isFirst = false; const p = clean.split('|'); body += '<div style="font-size:11pt;font-weight:bold">' + p[0].trim() + (p[1] ? ' <span style="font-weight:normal;font-size:9pt">| ' + p.slice(1).join(' | ').trim() + '</span>' : '') + '</div>'; continue; }
+    if (clean.includes('@') || clean.includes('Sponsorship')) { body += '<div style="font-size:8.5pt;margin-bottom:4px">' + clean + '</div>'; continue; }
+    if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && !clean.startsWith('\u2022')) { body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:9px;margin-bottom:4px">' + clean + '</div>'; continue; }
+    if (clean.startsWith('\u2022')) { body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">\u2022</span><span>' + clean.slice(1).trim() + '</span></div>'; continue; }
+    const dm = clean.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}/);
+    if (dm && !clean.startsWith('Additional')) { const mi = clean.lastIndexOf(dm[0]); const main = clean.slice(0, mi).replace(/\|\s*$/,'').trim(); const date = clean.slice(mi).trim(); body += '<div style="display:flex;justify-content:space-between;font-weight:bold;font-size:8.5pt;margin-top:5px"><span>' + main + '</span><span>' + date + '</span></div>'; continue; }
+    body += '<div style="font-size:8.5pt;margin:1px 0">' + clean + '</div>';
   }
-
-  const co = lastHeading ? lastHeading.split('--')[0].trim().replace(/\s+/g,'_') : 'Company';
-  const role = lastHeading ? (lastHeading.split('--')[1]||'').trim().replace(/\s+/g,'_') : 'Role';
-  doc.save('Adithi_Chowdhury_Resume_' + co + '_' + role + '.pdf');
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume</title><style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}@media print{button{display:none}body{margin:.5in}}</style></head><body><div style="text-align:right;margin-bottom:12px"><button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF \u2197</button></div>' + body + '</body></html>';
+  const w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); }
+  else { alert('Please allow popups for this site, then try again.'); }
 }
 </script>
 
