@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_5.html -->
+<!-- saved from url=(0050)file:///Users/adithichowdhury/Downloads/index.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,22 +107,14 @@ textarea { min-height: 110px; resize: vertical; }
     <div class="label">Upload Files</div>
     <div class="grid2">
       <div>
-        <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Resume(s)</p>
-        <div class="upload-box">
-          <p>PDF or TXT</p>
-          <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleResume(this.files)">
-          <button class="btn-sm" onclick="document.getElementById(&#39;resume-input&#39;).click()">Choose File</button>
-          <div class="fname" id="resume-name"></div>
-        </div>
+        <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Resume(s) — PDF or TXT</p>
+        <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleResume(this.files)" style="width:100%;font-family:Figtree,sans-serif;font-size:0.82rem;padding:0.5rem;border:1px solid #ddd9d0;border-radius:6px;background:#f0ede6;cursor:pointer;">
+        <div class="fname" id="resume-name"></div>
       </div>
       <div>
-        <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Outreach Templates</p>
-        <div class="upload-box">
-          <p>PDF or TXT</p>
-          <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleTemplate(this.files)">
-          <button class="btn-sm" onclick="document.getElementById(&#39;template-input&#39;).click()">Choose File</button>
-          <div class="fname" id="template-name"></div>
-        </div>
+        <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Outreach Templates — PDF or TXT</p>
+        <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleTemplate(this.files)" style="width:100%;font-family:Figtree,sans-serif;font-size:0.82rem;padding:0.5rem;border:1px solid #ddd9d0;border-radius:6px;background:#f0ede6;cursor:pointer;">
+        <div class="fname" id="template-name"></div>
       </div>
     </div>
   </div>
