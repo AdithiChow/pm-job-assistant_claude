@@ -448,14 +448,18 @@ function openResumeWindow(text) {
 
   // Render header centered
   if (nameLine) {
-    var clean = nameLine.replace(/\*\*/g,'');
-    body += '<div style="text-align:center;font-size:12pt;font-weight:bold;margin-bottom:3px">' + clean + '</div>';
+    var nameClean = nameLine.replace(/\*\*/g,'');
+    // If title ended up on a separate line (no | in name), combine with next summary line
+    if (nameClean.indexOf('|') === -1 && summaryLines.length && summaryLines[0].indexOf('@') === -1 && summaryLines[0].indexOf('years') === -1 && summaryLines[0].length < 60) {
+      nameClean = nameClean + ' | ' + summaryLines.shift();
+    }
+    body += '<div style="text-align:center;font-size:12pt;font-weight:bold;margin-bottom:3px">' + nameClean + '</div>';
   }
   if (contactLine) {
     body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:4px">' + contactLine + '</div>';
   }
   if (summaryLines.length) {
-    var summary = summaryLines.join(' ').replace(/^[""]+|[""]+$/g,'').trim();
+    var summary = summaryLines.join(' ').replace(/^\s*["""]+\s*|\s*["""]+\s*$/g,'').trim();
     body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:8px;padding:0 5px">' + summary + '</div>';
   }
 
@@ -470,10 +474,11 @@ function openResumeWindow(text) {
     if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && clean.indexOf('*') === -1 && clean.indexOf('|') === -1) {
       body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:10px;margin-bottom:4px;padding-bottom:1px">' + clean + '</div>'; continue;
     }
-    // Bullet points
-    if (clean.indexOf('*') === 0 || clean.indexOf('•') === 0) {
-      var bt = clean.replace(/^[\*•]\s*/, '');
-      body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">•</span><span>' + bt + '</span></div>'; continue;
+    // Bullet points - handle *, •, and quoted lines (AI-edited bullets come through as "text")
+    var isQuotedBullet = (clean.charAt(0) === '"' || clean.charAt(0) === '\u201c') && clean.length > 40;
+    if (clean.indexOf('*') === 0 || clean.indexOf('•') === 0 || isQuotedBullet) {
+      var bt = clean.replace(/^[\*•"""\u201c\u201d]\s*/, '').replace(/["""\u201d]$/, '');
+      body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold || isQuotedBullet ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">•</span><span>' + bt + '</span></div>'; continue;
     }
     // Lines with dates (job titles) - bold with date right-aligned
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
