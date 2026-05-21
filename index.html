@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///Users/adithichowdhury/Downloads/index.html -->
+<!-- saved from url=(0052)file:///Users/adithichowdhury/Downloads/index_1.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -459,7 +459,7 @@ function openResumeWindow(text) {
     body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:4px">' + contactLine + '</div>';
   }
   if (summaryLines.length) {
-    var summary = summaryLines.join(' ').replace(/^\s*["""]+\s*|\s*["""]+\s*$/g,'').trim();
+    var summary = summaryLines.join(' ').replace(/\*\*/g,'').replace(/^\s*["""]+\s*|\s*["""]+\s*$/g,'').trim();
     body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:8px;padding:0 5px">' + summary + '</div>';
   }
 
