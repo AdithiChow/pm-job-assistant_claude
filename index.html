@@ -430,6 +430,8 @@ function openResumeWindow(text) {
   var lines = text.split('\n');
   var body = '';
   var isFirst = true;
+  var isSecond = false;
+  var isThird = false;
 
   for (var i = 0; i < lines.length; i++) {
     var t = lines[i].trim();
@@ -437,22 +439,38 @@ function openResumeWindow(text) {
     var isBold = t.indexOf('**') === 0 && t.lastIndexOf('**') === t.length - 2 && t.length > 4;
     var clean = isBold ? t.slice(2, t.length - 2).trim() : t;
 
+    // Name line - centered, large, bold
     if (isFirst) {
-      isFirst = false;
+      isFirst = false; isSecond = true;
       var p = clean.split('|');
-      body += '<div style="font-size:11pt;font-weight:bold">' + p[0].trim() + (p[1] ? ' <span style="font-weight:normal;font-size:9pt">| ' + p.slice(1).join(' | ').trim() + '</span>' : '') + '</div>';
+      body += '<div style="text-align:center;font-size:12pt;font-weight:bold;margin-bottom:2px">' + p[0].trim() + '</div>';
+      if (p[1]) body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:2px">' + p.slice(1).join(' | ').trim() + '</div>';
       continue;
     }
-    if (clean.indexOf('@') > -1 || clean.indexOf('Sponsorship') > -1) {
-      body += '<div style="font-size:8.5pt;margin-bottom:4px">' + clean + '</div>'; continue;
+    // Contact line - centered
+    if (isSecond && (clean.indexOf('@') > -1 || clean.indexOf('Sponsorship') > -1 || clean.indexOf('Seattle') > -1)) {
+      body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:3px">' + clean + '</div>';
+      isSecond = false; isThird = true;
+      continue;
     }
-    if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && clean.indexOf('*') === -1) {
-      body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:9px;margin-bottom:4px;padding-bottom:1px">' + clean + '</div>'; continue;
+    // Summary/headliner - centered, italic
+    if (isThird && !clean.startsWith('PROFESSIONAL') && clean.length > 30) {
+      body += '<div style="text-align:center;font-size:8.5pt;font-style:italic;margin-bottom:6px;padding:0 10px">' + clean.replace(/^["\u201c]|["\u201d]$/g,'') + '</div>';
+      isThird = false;
+      continue;
     }
-    if (clean.indexOf('*') === 0 || clean.indexOf('\u2022') === 0) {
-      var bt = clean.replace(/^[\*\u2022]\s*/, '');
-      body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">\u2022</span><span>' + bt + '</span></div>'; continue;
+    isThird = false;
+
+    // Section headers ALL CAPS with underline - bold
+    if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && clean.indexOf('*') === -1 && clean.indexOf('|') === -1) {
+      body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:10px;margin-bottom:4px;padding-bottom:1px">' + clean + '</div>'; continue;
     }
+    // Bullet points
+    if (clean.indexOf('*') === 0 || clean.indexOf('•') === 0) {
+      var bt = clean.replace(/^[\*•]\s*/, '');
+      body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">•</span><span>' + bt + '</span></div>'; continue;
+    }
+    // Lines with dates (job titles) - bold with date right-aligned
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var hasDate = false;
     for (var m = 0; m < months.length; m++) { if (clean.indexOf(months[m]) > -1 && /\d{4}/.test(clean)) { hasDate = true; break; } }
@@ -464,17 +482,28 @@ function openResumeWindow(text) {
         body += '<div style="display:flex;justify-content:space-between;font-weight:bold;font-size:8.5pt;margin-top:5px"><span>' + main + '</span><span>' + date + '</span></div>'; continue;
       }
     }
+    // Education institution lines and CERTIFICATIONS/CORE SKILLS labels - bold
+    var boldLines = ['University of Notre Dame','University of Dhaka','CERTIFICATIONS','CORE SKILLS'];
+    var shouldBold = false;
+    for (var b = 0; b < boldLines.length; b++) { if (clean.indexOf(boldLines[b]) > -1) { shouldBold = true; break; } }
+    if (shouldBold) {
+      body += '<div style="font-size:8.5pt;font-weight:bold;margin:2px 0">' + clean + '</div>'; continue;
+    }
+    // Everything else
     body += '<div style="font-size:8.5pt;margin:1px 0">' + clean + '</div>';
   }
 
-  var co = lastHeading ? lastHeading.split('--')[0].trim() : 'Company';
-  var role = lastHeading ? (lastHeading.split('--')[1] || '').trim() : 'Role';
+  var printCSS = '@media print{' +
+    'body{margin:.5in}' +
+    '.no-print{display:none}' +
+    'head title{display:none}' +
+    '@page{margin:.5in;size:letter}' +
+  '}';
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume - ' + co + '</title>' +
-    '<style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}' +
-    '@media print{body{margin:.5in}.no-print{display:none}}</style></head><body>' +
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume</title>' +
+    '<style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}' + printCSS + '</style></head><body>' +
     '<div class="no-print" style="text-align:right;margin-bottom:12px">' +
-    '<button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF &#8599;</button>' +
+    '<button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF ↗</button>' +
     '</div>' + body + '</body></html>';
 
   var w = window.open('', '_blank');
