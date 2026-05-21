@@ -429,37 +429,42 @@ function generateResume() {
 function openResumeWindow(text) {
   var lines = text.split('\n');
   var body = '';
-  var isFirst = true;
-  var isSecond = false;
-  var isThird = false;
+  var headerDone = false;
+  var nameLine = '';
+  var contactLine = '';
+  var summaryLines = [];
+  var bodyLines = [];
+  var inHeader = true;
 
+  // Collect header lines (name, contact, summary) before PROFESSIONAL EXPERIENCE
   for (var i = 0; i < lines.length; i++) {
     var t = lines[i].trim();
+    if (!t) continue;
+    if (t.toUpperCase().indexOf('PROFESSIONAL') > -1) { bodyLines = lines.slice(i); break; }
+    if (!nameLine) { nameLine = t; continue; }
+    if (!contactLine && (t.indexOf('@') > -1 || t.indexOf('Seattle') > -1 || t.indexOf('Sponsorship') > -1)) { contactLine = t; continue; }
+    summaryLines.push(t);
+  }
+
+  // Render header centered
+  if (nameLine) {
+    var clean = nameLine.replace(/\*\*/g,'');
+    body += '<div style="text-align:center;font-size:12pt;font-weight:bold;margin-bottom:3px">' + clean + '</div>';
+  }
+  if (contactLine) {
+    body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:4px">' + contactLine + '</div>';
+  }
+  if (summaryLines.length) {
+    var summary = summaryLines.join(' ').replace(/^[""]+|[""]+$/g,'').trim();
+    body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:8px;padding:0 5px">' + summary + '</div>';
+  }
+
+  // Render body
+  for (var i = 0; i < bodyLines.length; i++) {
+    var t = bodyLines[i].trim();
     if (!t) { body += '<div style="height:3px"></div>'; continue; }
     var isBold = t.indexOf('**') === 0 && t.lastIndexOf('**') === t.length - 2 && t.length > 4;
     var clean = isBold ? t.slice(2, t.length - 2).trim() : t;
-
-    // Name line - centered, large, bold
-    if (isFirst) {
-      isFirst = false; isSecond = true;
-      var p = clean.split('|');
-      body += '<div style="text-align:center;font-size:12pt;font-weight:bold;margin-bottom:2px">' + p[0].trim() + '</div>';
-      if (p[1]) body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:2px">' + p.slice(1).join(' | ').trim() + '</div>';
-      continue;
-    }
-    // Contact line - centered
-    if (isSecond && (clean.indexOf('@') > -1 || clean.indexOf('Sponsorship') > -1 || clean.indexOf('Seattle') > -1)) {
-      body += '<div style="text-align:center;font-size:8.5pt;margin-bottom:3px">' + clean + '</div>';
-      isSecond = false; isThird = true;
-      continue;
-    }
-    // Summary/headliner - centered, italic
-    if (isThird && !clean.startsWith('PROFESSIONAL') && clean.length > 30) {
-      body += '<div style="text-align:center;font-size:8.5pt;font-style:italic;margin-bottom:6px;padding:0 10px">' + clean.replace(/^["\u201c]|["\u201d]$/g,'') + '</div>';
-      isThird = false;
-      continue;
-    }
-    isThird = false;
 
     // Section headers ALL CAPS with underline - bold
     if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && clean.indexOf('*') === -1 && clean.indexOf('|') === -1) {
@@ -493,15 +498,10 @@ function openResumeWindow(text) {
     body += '<div style="font-size:8.5pt;margin:1px 0">' + clean + '</div>';
   }
 
-  var printCSS = '@media print{' +
-    'body{margin:.5in}' +
-    '.no-print{display:none}' +
-    'head title{display:none}' +
-    '@page{margin:.5in;size:letter}' +
-  '}';
+  var printCSS = '@media print{body{margin:.5in}.no-print{display:none}}@page{margin:.5in;size:letter;marks:none}';
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume</title>' +
-    '<style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}' + printCSS + '</style></head><body>' +
+    '<style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}' + printCSS + '</style></head><body onload="if(document.title)document.title=\"Resume\"">' +
     '<div class="no-print" style="text-align:right;margin-bottom:12px">' +
     '<button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF ↗</button>' +
     '</div>' + body + '</body></html>';
