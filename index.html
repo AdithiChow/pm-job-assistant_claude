@@ -24,10 +24,8 @@ textarea { min-height: 110px; resize: vertical; }
 .row { display: flex; gap: 0.6rem; align-items: center; }
 .row input { flex: 1; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
-.upload-box { border: 1.5px dashed #c9c4b8; border-radius: 6px; padding: 1rem; text-align: center; background: #f0ede6; }
-.upload-box p { font-size: 0.8rem; color: #5a574f; margin-bottom: 0.5rem; }
-.upload-box input[type=file] { display: none; }
-.fname { font-size: 0.78rem; color: #2d4a3e; font-weight: 500; margin-top: 0.4rem; min-height: 1rem; }
+input[type=file] { width: 100%; font-family: 'Figtree', sans-serif; font-size: 0.82rem; padding: 0.5rem; border: 1px solid #ddd9d0; border-radius: 6px; background: #f0ede6; cursor: pointer; }
+.fname { font-size: 0.78rem; color: #2d4a3e; font-weight: 500; margin-top: 0.3rem; min-height: 1rem; }
 .toggle-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.9rem; cursor: pointer; user-select: none; }
 .tog { width: 34px; height: 18px; background: #c9c4b8; border-radius: 9px; position: relative; transition: background 0.2s; flex-shrink: 0; }
 .tog.on { background: #2d4a3e; }
@@ -41,8 +39,6 @@ textarea { min-height: 110px; resize: vertical; }
 .btn-primary:hover:not(:disabled) { opacity: 0.85; }
 .btn-ghost { background: transparent; border: 1px solid #ddd9d0; color: #5a574f; }
 .btn-ghost:hover:not(:disabled) { background: #f0ede6; }
-.btn-sm { font-family: 'Figtree', sans-serif; font-size: 0.78rem; font-weight: 500; padding: 0.35rem 0.8rem; border-radius: 6px; cursor: pointer; border: none; background: #2d4a3e; color: #fff; }
-.btn-sm:hover { opacity: 0.85; }
 .actions { display: flex; gap: 0.75rem; margin-top: 1rem; align-items: center; }
 .hint { font-size: 0.75rem; color: #8a8780; margin-top: 0.35rem; }
 .status { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; color: #5a574f; padding: 0.7rem 1rem; background: #e8f0ec; border: 1px solid #b8d4c4; border-radius: 6px; margin-bottom: 1rem; }
@@ -50,7 +46,7 @@ textarea { min-height: 110px; resize: vertical; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .err { background: #fdf0f0; border: 1px solid #f0baba; border-radius: 6px; padding: 0.8rem 1rem; font-size: 0.85rem; color: #7a1e1e; margin-bottom: 1rem; }
 .result-wrap { margin-top: 1.5rem; }
-.banner { font-size: 1.2rem; font-weight: 600; padding: 1rem 1.25rem; background: #fff; border: 1px solid #ddd9d0; border-radius: 10px; margin-bottom: 0.75rem; color: #1a1916; }
+.banner { font-size: 1.2rem; font-weight: 600; padding: 1rem 1.25rem; background: #fff; border: 1px solid #ddd9d0; border-radius: 10px; margin-bottom: 0.75rem; }
 .banner span { color: #4a7c66; }
 .section { background: #fff; border: 1px solid #ddd9d0; border-radius: 10px; margin-bottom: 0.6rem; overflow: hidden; }
 .sec-head { display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.1rem; cursor: pointer; }
@@ -58,7 +54,6 @@ textarea { min-height: 110px; resize: vertical; }
 .sec-left { display: flex; align-items: center; gap: 0.6rem; }
 .num { width: 20px; height: 20px; border-radius: 50%; background: #2d4a3e; color: #fff; font-size: 0.68rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sec-title { font-size: 0.875rem; font-weight: 500; }
-.sec-right { display: flex; align-items: center; gap: 0.5rem; }
 .chev { font-size: 0.7rem; color: #8a8780; transition: transform 0.2s; }
 .chev.open { transform: rotate(180deg); }
 .copy-btn { font-family:'Figtree',sans-serif; font-size:0.72rem; color:#8a8780; background:transparent; border:1px solid #ddd9d0; border-radius:5px; padding:0.2rem 0.55rem; cursor:pointer; }
@@ -74,11 +69,9 @@ textarea { min-height: 110px; resize: vertical; }
 </head>
 <body>
 <div class="shell">
-
   <h1>PM Application <span>Assistant</span></h1>
   <p class="sub">Paste a job URL, upload your files, and get outreach materials in one shot.</p>
 
-  <!-- API Key -->
   <div class="card">
     <div class="label">Anthropic API Key</div>
     <div class="row">
@@ -89,7 +82,6 @@ textarea { min-height: 110px; resize: vertical; }
     <div class="hint" id="key-hint">Paste once — saved in this browser automatically.</div>
   </div>
 
-  <!-- Job URL -->
   <div class="card">
     <div class="label">Job Posting URL</div>
     <input type="url" id="job-url" placeholder="https://company.com/jobs/...">
@@ -102,24 +94,22 @@ textarea { min-height: 110px; resize: vertical; }
     </div>
   </div>
 
-  <!-- Uploads -->
   <div class="card">
     <div class="label">Upload Files</div>
     <div class="grid2">
       <div>
         <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Resume(s) — PDF or TXT</p>
-        <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleResume(this.files)" style="width:100%;font-family:Figtree,sans-serif;font-size:0.82rem;padding:0.5rem;border:1px solid #ddd9d0;border-radius:6px;background:#f0ede6;cursor:pointer;">
+        <input type="file" id="resume-input" accept=".pdf,.txt" multiple="" onchange="handleResume(this.files)">
         <div class="fname" id="resume-name"></div>
       </div>
       <div>
         <p style="font-size:0.78rem;color:#8a8780;margin-bottom:0.35rem;">Outreach Templates — PDF or TXT</p>
-        <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleTemplate(this.files)" style="width:100%;font-family:Figtree,sans-serif;font-size:0.82rem;padding:0.5rem;border:1px solid #ddd9d0;border-radius:6px;background:#f0ede6;cursor:pointer;">
+        <input type="file" id="template-input" accept=".pdf,.txt" onchange="handleTemplate(this.files)">
         <div class="fname" id="template-name"></div>
       </div>
     </div>
   </div>
 
-  <!-- Quick mode + Run -->
   <div class="card" style="padding:1rem 1.25rem;">
     <div class="toggle-row" style="margin:0;" onclick="toggleQuick()">
       <div class="tog" id="quick-tog"></div>
@@ -136,34 +126,31 @@ textarea { min-height: 110px; resize: vertical; }
   <div id="status-area" style="margin-top:1rem;"></div>
   <div id="result-area"></div>
   <div id="resume-bar-area"></div>
-
 </div>
-<script>
-// ── State ────────────────────────────────────────────────────────────
-let resumeFiles = [];
-let templateFile = null;
-let quickMode = false;
-let jdOpen = false;
-let keyVisible = false;
-let lastFullText = '';
-let lastHeading = '';
-let openSections = {};
 
-// ── Init ─────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('pm_api_key');
+<script>
+var resumeFiles = [];
+var templateFile = null;
+var quickMode = false;
+var jdOpen = false;
+var keyVisible = false;
+var lastFullText = '';
+var lastHeading = '';
+var openSections = {};
+
+window.addEventListener('DOMContentLoaded', function() {
+  var saved = localStorage.getItem('pm_api_key');
   if (saved) {
     document.getElementById('api-key').value = saved;
-    document.getElementById('key-hint').textContent = '✓ Key saved in this browser.';
+    document.getElementById('key-hint').textContent = 'Key saved in this browser.';
   }
   document.getElementById('api-key').addEventListener('change', function() {
-    const v = this.value.trim();
-    if (v) { localStorage.setItem('pm_api_key', v); document.getElementById('key-hint').textContent = '✓ Key saved in this browser.'; }
+    var v = this.value.trim();
+    if (v) { localStorage.setItem('pm_api_key', v); document.getElementById('key-hint').textContent = 'Key saved in this browser.'; }
     else { localStorage.removeItem('pm_api_key'); document.getElementById('key-hint').textContent = 'Paste once — saved in this browser automatically.'; }
   });
 });
 
-// ── Key controls ──────────────────────────────────────────────────────
 function toggleKey() {
   keyVisible = !keyVisible;
   document.getElementById('api-key').type = keyVisible ? 'text' : 'password';
@@ -174,8 +161,6 @@ function clearKey() {
   document.getElementById('api-key').value = '';
   document.getElementById('key-hint').textContent = 'Paste once — saved in this browser automatically.';
 }
-
-// ── Toggles ───────────────────────────────────────────────────────────
 function toggleJD() {
   jdOpen = !jdOpen;
   document.getElementById('jd-tog').className = 'tog' + (jdOpen ? ' on' : '');
@@ -186,40 +171,35 @@ function toggleQuick() {
   document.getElementById('quick-tog').className = 'tog' + (quickMode ? ' on' : '');
   document.getElementById('run-btn').textContent = quickMode ? 'Run quick mode ↗' : 'Run full workflow ↗';
 }
-
-// ── File handling ─────────────────────────────────────────────────────
 function handleResume(files) {
   resumeFiles = Array.from(files);
-  document.getElementById('resume-name').textContent = resumeFiles.map(f => f.name).join(', ');
+  document.getElementById('resume-name').textContent = resumeFiles.map(function(f){ return f.name; }).join(', ');
 }
 function handleTemplate(files) {
   templateFile = files[0] || null;
   document.getElementById('template-name').textContent = templateFile ? templateFile.name : '';
 }
-
-async function toBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = () => rej(new Error('Read failed'));
+function toBase64(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = function() { res(r.result.split(',')[1]); };
+    r.onerror = function() { rej(new Error('Read failed')); };
     r.readAsDataURL(file);
   });
 }
-async function toText(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = () => rej(new Error('Read failed'));
+function toText(file) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    r.onload = function() { res(r.result); };
+    r.onerror = function() { rej(new Error('Read failed')); };
     r.readAsText(file);
   });
 }
-
-// ── UI helpers ────────────────────────────────────────────────────────
 function showErr(msg) { document.getElementById('err-area').innerHTML = '<div class="err">' + msg + '</div>'; }
 function clearErr() { document.getElementById('err-area').innerHTML = ''; }
 function showStatus(msg) { document.getElementById('status-area').innerHTML = '<div class="status"><div class="dot"></div>' + msg + '</div>'; }
 function clearStatus() { document.getElementById('status-area').innerHTML = ''; }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function resetAll() {
   resumeFiles = []; templateFile = null; quickMode = false; jdOpen = false;
@@ -238,33 +218,40 @@ function resetAll() {
   document.getElementById('resume-bar-area').innerHTML = '';
 }
 
-// ── Section rendering ─────────────────────────────────────────────────
-const SECTION_LABELS = ['Role Analysis','Company & Role Research','Resume Base Pick','Resume Bullet Edits','Cold InMail','LinkedIn Connection Request','Warnings & Blanks'];
+var SECTION_LABELS = ['Role Analysis','Company & Role Research','Resume Base Pick','Resume Bullet Edits','Cold InMail','LinkedIn Connection Request','Warnings & Blanks'];
 
 function parseSections(text) {
-  const patterns = [
+  var patterns = [
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Role Analysis|Step 1)/i,
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Company|Role Research|Step 2)/i,
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Resume Base|Resume Variant|Step 3)/i,
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Resume Bullet|Bullet Edit)/i,
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Cold InMail|InMail|Step 4)/i,
     /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:LinkedIn Connection|Connection Request|Step 5)/i,
-    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Warning|Blank|Step 6)/i,
+    /(?:^|\n)#{1,3}\s*(?:\*\*)?(?:\d+\.\s*)?(?:Warning|Blank|Step 6)/i
   ];
-  const matches = [];
-  patterns.forEach((p, i) => { const m = text.match(p); if (m) matches.push({ idx: i, pos: m.index }); });
-  matches.sort((a, b) => a.pos - b.pos);
+  var matches = [];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = text.match(patterns[i]);
+    if (m) matches.push({ idx: i, pos: m.index });
+  }
+  matches.sort(function(a,b){ return a.pos - b.pos; });
   if (!matches.length) return [{ label: 'Results', content: text }];
-  const sections = matches.map((m, i) => ({
-    label: SECTION_LABELS[m.idx] || 'Section',
-    content: text.slice(m.pos, matches[i+1]?.pos ?? text.length).replace(/^#{1,3}[^\n]*\n?/,'').trim()
-  }));
+  var sections = [];
+  for (var j = 0; j < matches.length; j++) {
+    var start = matches[j].pos;
+    var end = matches[j+1] ? matches[j+1].pos : text.length;
+    sections.push({
+      label: SECTION_LABELS[matches[j].idx] || 'Section',
+      content: text.slice(start, end).replace(/^#{1,3}[^\n]*\n?/, '').trim()
+    });
+  }
   if (matches[0].pos > 60) sections.unshift({ label: 'Summary', content: text.slice(0, matches[0].pos).trim() });
   return sections;
 }
 
 function extractHeading(text) {
-  const m = text.match(/^[\*#\s]*([A-Z][^\n]{5,80}--[^\n]+)/m);
+  var m = text.match(/^[\*#\s]*([A-Z][^\n]{5,80}--[^\n]+)/m);
   return m ? m[1].replace(/\*\*/g,'') : null;
 }
 
@@ -275,103 +262,58 @@ function toggleSection(i) {
 }
 
 function copySection(i, btn) {
-  navigator.clipboard.writeText(document.getElementById('sb-'+i).textContent).then(() => {
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1800);
+  navigator.clipboard.writeText(document.getElementById('sb-'+i).textContent).then(function() {
+    btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1800);
   });
 }
 
 function renderResults(heading, sections) {
-  let html = '';
+  var html = '';
   if (heading) {
-    const p = heading.split('--').map(s => s.trim());
+    var p = heading.split('--').map(function(s){ return s.trim(); });
     html += '<div class="banner">' + esc(p[0]) + (p[1] ? ' <span>— ' + esc(p[1]) + '</span>' : '') + '</div>';
   }
   html += '<div class="result-wrap">';
-  sections.forEach((s, i) => {
+  for (var i = 0; i < sections.length; i++) {
     openSections[i] = true;
     html += '<div class="section">' +
       '<div class="sec-head" onclick="toggleSection('+i+')">' +
-        '<div class="sec-left"><div class="num">'+(i+1)+'</div><div class="sec-title">'+esc(s.label)+'</div></div>' +
-        '<div class="sec-right">' +
+        '<div class="sec-left"><div class="num">'+(i+1)+'</div><div class="sec-title">'+esc(sections[i].label)+'</div></div>' +
+        '<div style="display:flex;align-items:center;gap:0.5rem;">' +
           '<button class="copy-btn" onclick="event.stopPropagation();copySection('+i+',this)">Copy</button>' +
-          '<div class="chev open" id="chev-'+i+'">▼</div>' +
+          '<div class="chev open" id="chev-'+i+'">&#9660;</div>' +
         '</div>' +
       '</div>' +
-      '<div class="sec-body" id="sb-'+i+'">'+esc(s.content)+'</div>' +
+      '<div class="sec-body" id="sb-'+i+'">'+esc(sections[i].content)+'</div>' +
     '</div>';
-  });
+  }
   html += '</div>';
   document.getElementById('result-area').innerHTML = html;
 }
 
-// ── System prompt ─────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `# PM Job Application Assistant
+var SYSTEM_PROMPT = "# PM Job Application Assistant\n\nYou are helping a senior PM job seeker generate tailored outreach materials.\n\n## Quick Mode\nIf the user message starts with 'quick', skip Steps 2 and 4. Produce only: Role Analysis, Resume Base Pick + Bullet Edits, LinkedIn Connection Request, Warnings if needed.\n\n## Workflow\n\n### Step 1: Role Analysis\nFetch the job posting URL. Identify top 3-5 nontrivial requirements overlapping with the user's profile. Skip generic filler. For each, note why it maps to the user's experience in 1 sentence. If the posting can't be fetched, ask the user to paste it manually.\n\n### Step 2: Company & Role Research\nSearch for recent news, launches, funding, or trends. Summarize 3-5 findings useful for outreach. Note connections to user's experience. Do NOT weave into outreach templates.\n\n### Step 3: Resume Customization\nPick the best resume variant. Revise the 2-line summary headliner. Suggest 2-5 skill swaps. Suggest bullet edits for top 3-5 requirements: quote original, provide revised, keep surgical.\n\n### Step 4: Cold InMail\n100-150 words. Subject line first. Direct, confident. No cliche openers.\n\n### Step 5: LinkedIn Connection Request\nUnder 300 characters. Casual. Ask to connect with recruiter or hiring contact.\n\n### Step 6: Warnings & Blanks\nOnly if needed.\n\n## Output Format\nStart with: [Company Name] -- [Role Title]\n\nThen:\n### 1. Role Analysis\n### 2. Company/Role Research\n### 3. Resume Base Pick\n### 4. Resume Bullet Edits\n### 5. Cold InMail\n### 6. LinkedIn Connection Request\n### 7. Warnings & Blanks\n\n## Rules\n- No em dashes. Use commas, semicolons, or parentheses.\n- Direct, concise, confident voice.\n- No cliche openers.\n- Use [___] sparingly.";
 
-You are helping a senior PM job seeker generate tailored outreach materials for each application.
-
-## Quick Mode
-If the user message starts with "quick", skip Steps 2 and 4 and produce only: Role Analysis, Resume Base Pick + Bullet Edits, LinkedIn Connection Request, and Warnings if needed.
-
-## Workflow
-
-### Step 1: Role Analysis
-Fetch the job posting URL. Identify top 3-5 nontrivial requirements that overlap with the user's profile. Skip generic filler. For each, note why it maps to the user's experience in 1 sentence.
-If the posting can't be extracted (Workday/iCIMS/JS-heavy), ask the user to paste it manually.
-
-### Step 2: Company & Role Research
-Search for recent news, launches, funding, or trends for this company and team. Summarize 3-5 findings useful for outreach. Note any connections to the user's experience. Do NOT weave into outreach templates.
-
-### Step 3: Resume Customization
-Pick the best resume variant. Revise the 2-line summary headliner. Suggest 2-5 skill swaps. Suggest bullet edits for top 3-5 requirements — quote original, provide revised, keep surgical and short.
-
-### Step 4: Cold InMail
-100-150 words. Subject line first. Direct, confident, not sycophantic. No "I was excited to see" or "I'd love to" openers.
-
-### Step 5: LinkedIn Connection Request
-Under 300 characters. Casual. Ask them to connect you with recruiter or hiring contact.
-
-### Step 6: Warnings & Blanks
-Only if needed. Flag [___] blanks or anything risky to send without review.
-
-## Output Format
-Start with: [Company Name] -- [Role Title]
-
-Then sections in order:
-### 1. Role Analysis
-### 2. Company/Role Research
-### 3. Resume Base Pick
-### 4. Resume Bullet Edits
-### 5. Cold InMail
-### 6. LinkedIn Connection Request
-### 7. Warnings & Blanks
-
-## Rules
-- No em dashes. Use commas, semicolons, or parentheses.
-- Direct, concise, confident voice.
-- No cliche openers.
-- Use [___] sparingly.`;
-
-// ── Main workflow ─────────────────────────────────────────────────────
 async function runWorkflow() {
   clearErr();
   document.getElementById('result-area').innerHTML = '';
   document.getElementById('resume-bar-area').innerHTML = '';
 
-  const apiKey = document.getElementById('api-key').value.trim();
+  var apiKey = document.getElementById('api-key').value.trim();
   if (!apiKey) { showErr('Please enter your Anthropic API key.'); return; }
 
-  const url = document.getElementById('job-url').value.trim();
-  const jd = document.getElementById('job-desc').value.trim();
+  var url = document.getElementById('job-url').value.trim();
+  var jd = document.getElementById('job-desc').value.trim();
   if (!url && !jd) { showErr('Please enter a job posting URL or paste the job description.'); return; }
 
-  const btn = document.getElementById('run-btn');
+  var btn = document.getElementById('run-btn');
   btn.disabled = true;
   showStatus('Reading files...');
 
   try {
-    const parts = [];
+    var parts = [];
 
-    for (const f of resumeFiles) {
+    for (var i = 0; i < resumeFiles.length; i++) {
+      var f = resumeFiles[i];
       if (f.name.endsWith('.txt')) {
         parts.push({ type: 'text', text: 'Resume "' + f.name + '":\n' + await toText(f) });
       } else {
@@ -391,7 +333,7 @@ async function runWorkflow() {
 
     showStatus('Running workflow — this may take a minute...');
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -408,10 +350,10 @@ async function runWorkflow() {
       })
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'API error ' + res.status);
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error ? data.error.message : 'API error ' + res.status);
 
-    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    var text = (data.content || []).filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
     if (!text) throw new Error('No content returned.');
 
     clearStatus();
@@ -421,8 +363,8 @@ async function runWorkflow() {
 
     document.getElementById('resume-bar-area').innerHTML =
       '<div class="resume-bar">' +
-        '<button class="btn-resume" id="res-btn" onclick="generateResume()">📄 Create Customized Resume</button>' +
-        '<span class="resume-note">Downloads as HTML — open and Print → Save as PDF</span>' +
+        '<button class="btn-resume" id="res-btn" onclick="generateResume()">&#128196; Create Customized Resume</button>' +
+        '<span class="resume-note">Opens in new tab — click Print to save as PDF</span>' +
       '</div>';
 
   } catch(e) {
@@ -433,135 +375,109 @@ async function runWorkflow() {
   }
 }
 
-// ── Resume generation ─────────────────────────────────────────────────
-const ORIGINAL_RESUME = `ADITHI CHOWDHURY | Senior Product Manager
-Seattle, WA | adithichowdhury@gmail.com | (574) 299-6353 | LinkedIn | No Sponsorship Required
-10+ years across Product Management, marketplace strategy, and brand leadership at Amazon and Unilever. Defined and scaled the Abusive Brand Building program, reducing missed enforcement by 50% and accelerating detection by 140%. Previously owned a $1.98B P&L across 9 categories, delivering 39.5% above revenue goal.
-
-PROFESSIONAL EXPERIENCE
-Amazon | Seattle, WA
-Senior Product Manager, Community Trust | Oct 2021 – Present
-• Defined and scaled the Abusive Brand Building (ABB) program in 2025, a network-level graph-based enforcement system, reducing missed enforcement by 50% and accelerating time-to-detect by 140%.
-• Built a scalable ABB detection pipeline combining ML and heuristic signals into a threshold-based risk scoring system, generating a 260K+ prioritized backlog of high-confidence abusive brands through cohort experimentation.
-• Engineered an automation-first enforcement pipeline across brand enforcement, review suppression, and ASIN takedowns, enforcing 5K+ brands, 8K+ sellers, and 0.5M+ ASINs while reducing reliance on manual escalations.
-• Conducted user research with 10 investigators to inform the design of investigator-friendly risk summaries and an interactive LLM assistant, cutting average handling time per case by 80% and avoiding 7 FTEs in incremental Ops capacity.
-• Re-architected identity abuse detection by integrating 200+ risk signals across account, payments, and country-specific dimensions, increasing enforcement by 559% YoY ahead of peak holiday.
-• Negotiated with VP-level stakeholders and the Applied Science lead to secure funding for continuous risk evaluation, validating a 53% enforcement uplift through a POC before unlocking full-scope investment.
-• Architected a three-pillar Vine integrity strategy (prevention, enforcement, discovery), cutting Vine abuse by 25% and enforcing 5M+ reviews through systemic gap closure.
-• Authored a VP-sponsored 3-year product vision and roadmap for the Identity abuse space, contributing to a 20bps reduction in reviews abuse through cross-org ML enhancements.
-• Drove cross-org alignment across Trust, Payments Risk, and Account Integrity teams, operationalizing shared risk signals and enforcement loops to improve enforcement by 10% MoM.
-• Benchmarked abuse detection strategies at financial institutions, identifying 3 gaps in Amazon's approach and incorporating 2 into the 3-year Identity abuse roadmap.
-• Managed a team of 3 program managers through hiring, onboarding, and performance development, promoting 1 high performer to the next level within a year while sustaining multi-year abuse prevention programs.
-
-Senior Product Manager, North America Remote Fulfillment (NARF) | Jan 2021 – Sep 2021
-• Executed the 0-to-1 launch of Prepaid Return Labels with a 24-hour refund feature, hitting 92% adoption in month one and generating $2.1M in cost savings while aligning the Canada returns experience with the U.S. standard.
-• Resolved inventory placement gaps by collaborating cross-functionally to separate NARF SKU flows from regular U.S. products, trimming delivery time by 1 day and saving $97M over 3 years.
-• Optimized import fee logic for amazon.ca shipping addresses, removing legal risk and eliminating inconsistent pricing across the shopping funnel.
-
-Senior Category Merchant Manager, Canada Hardlines | Jul 2019 – Jan 2021
-• Developed a Product Family growth strategy benchmarking Canada Hardlines against U.S. and FRITES, delivering $1.98B in annual GMS (+39.5% vs goal) and $205M in operating profit (+79.6% vs goal) across 9 categories.
-• Partnered with the NARF product team to launch the Canada program, informing selection strategy, opt-in/opt-out design decisions, pricing, and promotion strategy.
-• Led Canada 3P Prime Day and Q4 strategy, surpassing deal goals by 32% ($91M above target) through seller education, 3P Prime Exclusive Discounts ($70.8M sales), and sourced deal execution.
-• Expanded selection by 4.1% via lost vendor recovery, targeted web crawling, and category gap closure in outdoor and ice hockey, adding $12M YoY revenue in Sports.
-
-Unilever | Dhaka, Bangladesh
-Hand and Body Brand Manager (Vaseline, Dove, Lux) | Jan 2013 – May 2017
-• Owned end-to-end product strategy and P&L for the Hand and Body category, crafting a data-driven category growth strategy that yielded a 15% YoY sales increase driven by a 32% YoY surge in Vaseline sales and a 3.2% market share gain.
-• Created the Vaseline Healing Campaign in partnership with the largest e-commerce site and a top NGO hospital, winning a gold award at the Digital Marketing Summit 2017.
-• Designed and executed the first-ever House of Lux fashion show in Bangladesh, earning $120K in PR and 5M digital impressions.
-
-Additional Experience: Splunk, Product Marketing MBA Intern (San Francisco, CA) | May 2018 – Aug 2018
-
-EDUCATION
-University of Notre Dame, Mendoza College of Business | Notre Dame, IN
-Master of Business Administration (MBA), Marketing | Business Analytics | MBA Forte Fellow | Cum Laude
-University of Dhaka, Institute of Business Administration | Dhaka, Bangladesh
-Bachelor of Business Administration (BBA), Finance | Marketing | Cum Laude
-
-CERTIFICATIONS: Amazon Day 1 Machine Learning Certification | MLU Generative AI Certification, Amazon
-CORE SKILLS: 0-to-1 Product Launches, Product Strategy & Vision, AI/ML Product Development, LLM Integration, Trust & Safety, Risk & Fraud Detection, Cross-Functional Team Leadership, Go-to-Market Strategy, Data Analysis & Experimentation, SQL, Python, Tableau, QuickSight`;
+var ORIGINAL_RESUME = "ADITHI CHOWDHURY | Senior Product Manager\nSeattle, WA | adithichowdhury@gmail.com | (574) 299-6353 | LinkedIn | No Sponsorship Required\n10+ years across Product Management, marketplace strategy, and brand leadership at Amazon and Unilever. Defined and scaled the Abusive Brand Building program, reducing missed enforcement by 50% and accelerating detection by 140%. Previously owned a $1.98B P&L across 9 categories, delivering 39.5% above revenue goal.\n\nPROFESSIONAL EXPERIENCE\nAmazon | Seattle, WA\nSenior Product Manager, Community Trust | Oct 2021 - Present\n* Defined and scaled the Abusive Brand Building (ABB) program in 2025, a network-level graph-based enforcement system, reducing missed enforcement by 50% and accelerating time-to-detect by 140%.\n* Built a scalable ABB detection pipeline combining ML and heuristic signals into a threshold-based risk scoring system, generating a 260K+ prioritized backlog of high-confidence abusive brands through cohort experimentation.\n* Engineered an automation-first enforcement pipeline across brand enforcement, review suppression, and ASIN takedowns, enforcing 5K+ brands, 8K+ sellers, and 0.5M+ ASINs while reducing reliance on manual escalations.\n* Conducted user research with 10 investigators to inform the design of investigator-friendly risk summaries and an interactive LLM assistant, cutting average handling time per case by 80% and avoiding 7 FTEs in incremental Ops capacity.\n* Re-architected identity abuse detection by integrating 200+ risk signals across account, payments, and country-specific dimensions, increasing enforcement by 559% YoY ahead of peak holiday.\n* Negotiated with VP-level stakeholders and the Applied Science lead to secure funding for continuous risk evaluation, validating a 53% enforcement uplift through a POC before unlocking full-scope investment.\n* Architected a three-pillar Vine integrity strategy (prevention, enforcement, discovery), cutting Vine abuse by 25% and enforcing 5M+ reviews through systemic gap closure.\n* Authored a VP-sponsored 3-year product vision and roadmap for the Identity abuse space, contributing to a 20bps reduction in reviews abuse through cross-org ML enhancements.\n* Drove cross-org alignment across Trust, Payments Risk, and Account Integrity teams, operationalizing shared risk signals and enforcement loops to improve enforcement by 10% MoM.\n* Benchmarked abuse detection strategies at financial institutions, identifying 3 gaps in Amazon's approach and incorporating 2 into the 3-year Identity abuse roadmap.\n* Managed a team of 3 program managers through hiring, onboarding, and performance development, promoting 1 high performer to the next level within a year.\n\nSenior Product Manager, North America Remote Fulfillment (NARF) | Jan 2021 - Sep 2021\n* Executed the 0-to-1 launch of Prepaid Return Labels with a 24-hour refund feature, hitting 92% adoption in month one and generating $2.1M in cost savings.\n* Resolved inventory placement gaps by collaborating cross-functionally to separate NARF SKU flows from regular U.S. products, trimming delivery time by 1 day and saving $97M over 3 years.\n* Optimized import fee logic for amazon.ca shipping addresses, removing legal risk and eliminating inconsistent pricing across the shopping funnel.\n\nSenior Category Merchant Manager, Canada Hardlines | Jul 2019 - Jan 2021\n* Developed a Product Family growth strategy delivering $1.98B in annual GMS (+39.5% vs goal) and $205M in operating profit (+79.6% vs goal) across 9 categories.\n* Partnered with the NARF product team to launch the Canada program, informing selection strategy, opt-in/opt-out design decisions, pricing, and promotion strategy.\n* Led Canada 3P Prime Day and Q4 strategy, surpassing deal goals by 32% ($91M above target).\n* Expanded selection by 4.1% via lost vendor recovery, targeted web crawling, and category gap closure, adding $12M YoY revenue in Sports.\n\nUnilever | Dhaka, Bangladesh\nHand and Body Brand Manager (Vaseline, Dove, Lux) | Jan 2013 - May 2017\n* Owned end-to-end product strategy and P&L, crafting a data-driven category growth strategy yielding a 15% YoY sales increase and a 3.2% market share gain.\n* Created the Vaseline Healing Campaign winning a gold award at the Digital Marketing Summit 2017.\n* Designed and executed the first-ever House of Lux fashion show in Bangladesh, earning $120K in PR and 5M digital impressions.\n\nAdditional Experience: Splunk, Product Marketing MBA Intern (San Francisco, CA) | May 2018 - Aug 2018\n\nEDUCATION\nUniversity of Notre Dame, Mendoza College of Business | Notre Dame, IN\nMBA, Marketing | Business Analytics | MBA Forte Fellow | Cum Laude\nUniversity of Dhaka, Institute of Business Administration | Dhaka, Bangladesh\nBBA, Finance | Marketing | Cum Laude\n\nCERTIFICATIONS: Amazon Day 1 Machine Learning Certification | MLU Generative AI Certification, Amazon\nCORE SKILLS: 0-to-1 Product Launches, Product Strategy & Vision, AI/ML Product Development, LLM Integration, Trust & Safety, Risk & Fraud Detection, Cross-Functional Team Leadership, Go-to-Market Strategy, Data Analysis & Experimentation, SQL, Python, Tableau, QuickSight";
 
 function generateResume() {
-  // Parse the workflow output to extract edits
-  const sections = parseSections(lastFullText);
-  const headlinerSection = (sections.find(s => s.label === 'Resume Base Pick') || {}).content || '';
-  const bulletSection = (sections.find(s => s.label === 'Resume Bullet Edits') || {}).content || '';
-
-  // Extract revised headliner (look for quoted or labelled summary text)
-  let newHeadliner = '';
-  const hlMatch = headlinerSection.match(/(?:revised?|new|updated|headliner)[^:]*:\s*[""]?([^
-"]+(?:
-[^
-"]+)?)/i);
-  if (hlMatch) newHeadliner = hlMatch[1].trim();
-
-  // Extract bullet replacements: look for "Revised:" or "->" patterns
-  const bulletEdits = [];
-  const bulletMatches = bulletSection.matchAll(/(?:revised?|new)[^:]*:\s*[•\-]?\s*(.+?)(?=
-(?:original|revised?|•|\-|$)|
-
-)/gis);
-  for (const m of bulletMatches) {
-    bulletEdits.push(m[1].trim());
+  var sections = parseSections(lastFullText);
+  var headlinerSection = '';
+  var bulletSection = '';
+  for (var i = 0; i < sections.length; i++) {
+    if (sections[i].label === 'Resume Base Pick') headlinerSection = sections[i].content;
+    if (sections[i].label === 'Resume Bullet Edits') bulletSection = sections[i].content;
   }
 
-  // Build resume text from original, applying edits
-  let resumeLines = ORIGINAL_RESUME.split('
-');
+  var resumeLines = ORIGINAL_RESUME.split('\n');
+  var resultLines = resumeLines.slice();
 
-  // Apply headliner if found
-  if (newHeadliner) {
-    for (let i = 0; i < resumeLines.length; i++) {
-      if (i > 0 && resumeLines[i].includes('years') && resumeLines[i].includes('Amazon')) {
-        resumeLines[i] = '**' + newHeadliner + '**';
-        if (resumeLines[i+1] && !resumeLines[i+1].startsWith('PROFESSIONAL')) {
-          resumeLines.splice(i+1, 1);
+  // Try to extract and apply headliner
+  var hlMatch = headlinerSection.match(/headliner[^:]*:([\s\S]{20,300}?)(?:\n\n|\n#|skills?|bullet)/i);
+  if (hlMatch) {
+    var newHL = hlMatch[1].trim().replace(/^["*]+|["*]+$/g, '').trim();
+    for (var i = 0; i < resultLines.length; i++) {
+      if (resultLines[i].includes('years across') || resultLines[i].includes('10+')) {
+        resultLines[i] = newHL;
+        if (resultLines[i+1] && !resultLines[i+1].startsWith('PROFESSIONAL') && !resultLines[i+1].startsWith('\n')) {
+          resultLines.splice(i+1, 1);
         }
         break;
       }
     }
   }
 
-  // Apply bullet edits - match original bullets and replace
-  if (bulletEdits.length > 0) {
-    let editIdx = 0;
-    // Look for "Original:" blocks to find which bullets to replace
-    const origMatches = [...bulletSection.matchAll(/original[^:]*:\s*[•\-]?\s*(.{20,100})/gi)];
-    origMatches.forEach((om, idx) => {
-      if (!bulletEdits[idx]) return;
-      const origSnippet = om[1].trim().slice(0, 50).toLowerCase();
-      for (let i = 0; i < resumeLines.length; i++) {
-        if (resumeLines[i].toLowerCase().includes(origSnippet.slice(0, 30))) {
-          resumeLines[i] = '• **' + bulletEdits[idx].replace(/^[•\-]\s*/, '') + '**';
+  // Try to apply bullet edits
+  var bulletBlocks = bulletSection.split(/\n(?=(?:requirement|\d+\.|bullet|original))/i);
+  for (var b = 0; b < bulletBlocks.length; b++) {
+    var block = bulletBlocks[b];
+    var origMatch = block.match(/original[^:]*:\s*[*•-]?\s*(.{20,120})/i);
+    var revMatch = block.match(/revised?[^:]*:\s*[*•-]?\s*(.{20,300})/i);
+    if (origMatch && revMatch) {
+      var snippet = origMatch[1].slice(0, 40).toLowerCase().replace(/[^a-z0-9 ]/g, '');
+      var revised = revMatch[1].trim().replace(/^[*•]+\s*/, '');
+      for (var k = 0; k < resultLines.length; k++) {
+        var lineLower = resultLines[k].toLowerCase().replace(/[^a-z0-9 ]/g, '');
+        if (lineLower.includes(snippet.slice(0, 25))) {
+          resultLines[k] = '**' + revised + '**';
           break;
         }
       }
-    });
+    }
   }
 
-  openResumeWindow(resumeLines.join('
-'));
+  openResumeWindow(resultLines.join('\n'));
 }
 
 function openResumeWindow(text) {
-  const lines = text.split('\n');
-  let body = '';
-  let isFirst = true;
-  for (let i = 0; i < lines.length; i++) {
-    const t = lines[i].trim();
+  var lines = text.split('\n');
+  var body = '';
+  var isFirst = true;
+
+  for (var i = 0; i < lines.length; i++) {
+    var t = lines[i].trim();
     if (!t) { body += '<div style="height:3px"></div>'; continue; }
-    const isBold = t.startsWith('**') && t.endsWith('**');
-    const clean = isBold ? t.slice(2,-2).trim() : t;
-    if (isFirst) { isFirst = false; const p = clean.split('|'); body += '<div style="font-size:11pt;font-weight:bold">' + p[0].trim() + (p[1] ? ' <span style="font-weight:normal;font-size:9pt">| ' + p.slice(1).join(' | ').trim() + '</span>' : '') + '</div>'; continue; }
-    if (clean.includes('@') || clean.includes('Sponsorship')) { body += '<div style="font-size:8.5pt;margin-bottom:4px">' + clean + '</div>'; continue; }
-    if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && !clean.startsWith('\u2022')) { body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:9px;margin-bottom:4px">' + clean + '</div>'; continue; }
-    if (clean.startsWith('\u2022')) { body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">\u2022</span><span>' + clean.slice(1).trim() + '</span></div>'; continue; }
-    const dm = clean.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}/);
-    if (dm && !clean.startsWith('Additional')) { const mi = clean.lastIndexOf(dm[0]); const main = clean.slice(0, mi).replace(/\|\s*$/,'').trim(); const date = clean.slice(mi).trim(); body += '<div style="display:flex;justify-content:space-between;font-weight:bold;font-size:8.5pt;margin-top:5px"><span>' + main + '</span><span>' + date + '</span></div>'; continue; }
+    var isBold = t.indexOf('**') === 0 && t.lastIndexOf('**') === t.length - 2 && t.length > 4;
+    var clean = isBold ? t.slice(2, t.length - 2).trim() : t;
+
+    if (isFirst) {
+      isFirst = false;
+      var p = clean.split('|');
+      body += '<div style="font-size:11pt;font-weight:bold">' + p[0].trim() + (p[1] ? ' <span style="font-weight:normal;font-size:9pt">| ' + p.slice(1).join(' | ').trim() + '</span>' : '') + '</div>';
+      continue;
+    }
+    if (clean.indexOf('@') > -1 || clean.indexOf('Sponsorship') > -1) {
+      body += '<div style="font-size:8.5pt;margin-bottom:4px">' + clean + '</div>'; continue;
+    }
+    if (clean === clean.toUpperCase() && clean.length > 4 && /[A-Z]{3}/.test(clean) && clean.indexOf('*') === -1) {
+      body += '<div style="font-weight:bold;font-size:8.5pt;border-bottom:1px solid #000;margin-top:9px;margin-bottom:4px;padding-bottom:1px">' + clean + '</div>'; continue;
+    }
+    if (clean.indexOf('*') === 0 || clean.indexOf('\u2022') === 0) {
+      var bt = clean.replace(/^[\*\u2022]\s*/, '');
+      body += '<div style="display:flex;gap:5px;font-size:8.5pt;margin:2px 0 2px 8px;' + (isBold ? 'font-weight:bold' : '') + '"><span style="flex-shrink:0">\u2022</span><span>' + bt + '</span></div>'; continue;
+    }
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var hasDate = false;
+    for (var m = 0; m < months.length; m++) { if (clean.indexOf(months[m]) > -1 && /\d{4}/.test(clean)) { hasDate = true; break; } }
+    if (hasDate && clean.indexOf('Additional') === -1) {
+      var di = clean.search(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}/);
+      if (di > 0) {
+        var main = clean.slice(0, di).replace(/\|\s*$/, '').trim();
+        var date = clean.slice(di).trim();
+        body += '<div style="display:flex;justify-content:space-between;font-weight:bold;font-size:8.5pt;margin-top:5px"><span>' + main + '</span><span>' + date + '</span></div>'; continue;
+      }
+    }
     body += '<div style="font-size:8.5pt;margin:1px 0">' + clean + '</div>';
   }
-  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume</title><style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}@media print{button{display:none}body{margin:.5in}}</style></head><body><div style="text-align:right;margin-bottom:12px"><button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF \u2197</button></div>' + body + '</body></html>';
-  const w = window.open('', '_blank');
+
+  var co = lastHeading ? lastHeading.split('--')[0].trim() : 'Company';
+  var role = lastHeading ? (lastHeading.split('--')[1] || '').trim() : 'Role';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resume - ' + co + '</title>' +
+    '<style>body{font-family:Arial,sans-serif;margin:.65in;color:#000;line-height:1.4}' +
+    '@media print{body{margin:.5in}.no-print{display:none}}</style></head><body>' +
+    '<div class="no-print" style="text-align:right;margin-bottom:12px">' +
+    '<button onclick="window.print()" style="background:#2d4a3e;color:white;border:none;padding:8px 18px;border-radius:5px;cursor:pointer;font-size:9pt">Print / Save as PDF &#8599;</button>' +
+    '</div>' + body + '</body></html>';
+
+  var w = window.open('', '_blank');
   if (w) { w.document.write(html); w.document.close(); }
   else { alert('Please allow popups for this site, then try again.'); }
 }
